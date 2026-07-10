@@ -1,0 +1,29 @@
+# Meisterwerk — robots.txt
+# Klassische Suchmaschinen + KI-Antwortmaschinen (GEO) explizit erlauben.
+User-agent: *
+Allow: /
+
+# KI-Crawler / Generative Engines ausdrücklich zulassen (Zitierbarkeit)
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# <-- PRO KUNDE: Domain anpassen (muss zu seo.siteUrl passen)
+Sitemap: https://www.example.de/sitemap.xml

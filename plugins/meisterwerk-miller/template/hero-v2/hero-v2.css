@@ -1,0 +1,72 @@
+/* ================= HERO V2 — Scroll-Scrub (Kairos-Prinzip) =================
+   Opt-in-Variante: ersetzt <section class="hero"> NUR wenn der Nutzer "v2 hero"
+   verlangt. Integration: README.md in diesem Ordner. Klassen hv2-* kollidieren
+   nicht mit v1. Timings sind austariert — nicht ändern.
+
+   Prinzip: 360vh-Scrollstrecke, 100vh gepinnt. Motiv zoomt heran (scale 1->2.5)
+   + dreht leicht (4°), versinkt im Nebel; Copy blendet früh aus; danach steht
+   die bild-gefüllte Wortmarke allein und blendet erst ganz am Ende aus. */
+
+.hv2-stage{
+  position:relative;height:360vh;margin-top:-94px; /* zieht wie v1 unter den Floating-Header */
+  --hv2-img:url('/public/hero-v2.webp');
+  --hv2-haze:#ffffff;          /* MUSS dem Seitenhintergrund entsprechen (body = #fff) */
+  --hv2-accent:var(--key2);    /* Highlight-Wort + Primär-Button; per config überschreibbar */
+  --hv2-focus-y:42%;           /* vertikaler Bildfokus */
+}
+html:not(.anim-on) .hv2-stage{height:100vh} /* prefers-reduced-motion: kein Scrub */
+
+.hv2-sticky{position:sticky;top:0;height:100vh;overflow:hidden;background:var(--hv2-haze)}
+
+.hv2-img{position:absolute;inset:-2%;
+  background:var(--hv2-img) center var(--hv2-focus-y)/cover no-repeat;
+  transform-origin:50% 46%;will-change:transform,opacity}
+
+/* leichte Abdunklung für Lesbarkeit der weißen Copy (Ton wie v1-Scrim) */
+.hv2-scrim{position:absolute;inset:0;background:rgba(10,22,34,.26);pointer-events:none}
+
+/* Nebel unten — Farbe hängt komplett an --hv2-haze */
+.hv2-haze-bottom{position:absolute;left:0;right:0;bottom:0;height:55%;pointer-events:none;
+  background:linear-gradient(to top,
+    var(--hv2-haze) 12%,
+    color-mix(in srgb, var(--hv2-haze) 90%, transparent) 32%,
+    color-mix(in srgb, var(--hv2-haze) 55%, transparent) 55%,
+    transparent 100%)}
+.hv2-haze-blur{position:absolute;left:0;right:0;bottom:0;height:32%;pointer-events:none;
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  -webkit-mask-image:linear-gradient(to top,#000 40%,transparent 100%);
+          mask-image:linear-gradient(to top,#000 40%,transparent 100%)}
+
+.hv2-copy{position:absolute;left:0;right:0;top:0;height:100vh;z-index:2;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:0 6vw;color:#fff;
+  text-shadow:0 2px 30px rgba(0,0,0,.35);will-change:opacity,transform}
+
+.hv2-eyebrow{display:inline-flex;gap:.5rem;align-items:center;
+  background:rgba(0,0,0,.25);padding:.4rem .9rem;border-radius:999px;
+  font-size:.8rem;letter-spacing:.05em;margin-bottom:1.4rem;
+  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+
+.hv2-title{font-size:clamp(2.2rem,5.4vw,4.6rem);line-height:1.04;font-weight:800;max-width:18ch}
+.hv2-hl{color:var(--hv2-accent)}
+.hv2-sub{margin-top:1.3rem;font-size:clamp(1rem,1.8vw,1.3rem);max-width:46ch;opacity:.95}
+
+.hv2-cta-row{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
+.hv2-btn{display:inline-flex;align-items:center;justify-content:center;
+  padding:0 26px;height:50px;border-radius:9px;font-weight:600;font-size:15px} /* Button-Sprache des Templates */
+.hv2-btn-primary{background:var(--btn);color:#fff}
+.hv2-btn-primary:hover{background:#16314c}
+.hv2-btn-ghost{border:1.5px solid rgba(255,255,255,.8);color:#fff}
+
+/* Wortmarke — mit dem Motiv gefüllt (background-clip: text) */
+.hv2-wordmark{position:absolute;left:0;right:0;top:50%;z-index:1;transform:translateY(-50%);
+  text-align:center;font-weight:800;letter-spacing:.02em;
+  font-size:clamp(3rem,15vw,13rem);line-height:.9;padding:0 4vw;
+  background:var(--hv2-img) center 45%/cover no-repeat;
+  -webkit-background-clip:text;background-clip:text;
+  color:transparent;-webkit-text-fill-color:transparent;
+  opacity:0;will-change:opacity,transform}
+
+/* Marken-Marquee als eigenes Band NACH dem Hero (v1-Marquee-Markup hier einsetzen) */
+.hv2-marq-band{padding:26px 0;background:var(--hv2-haze)}
+.hv2-marq-band .hero-marq{position:static;padding:0}

@@ -1,0 +1,29 @@
+# Meisterwerk — Skill-Router (v0.2)
+
+Dachdecker-Website-Werk: bestehende Kundenseite scrapen → Daten extrahieren →
+in das fixe Premium-Template einsetzen → prüfen. Design & Animationen sind fix.
+
+## handwerk-site-builder
+Orchestrator: Scrape (Firecrawl) → Extraktion (Logo/Farben/Fotos/NAP/Leistungen/Bewertungen)
+→ Template klonen → config/site.ts + Markenfarbe + Bilder personalisieren → SEO/GEO → Build → Browser-QC.
+Triggers: Meisterwerk, Dachdecker-Seite bauen, Website für [Betrieb], bestehende Seite relaunchen, [URL].
+
+## handwerk-design-system
+Hüter des fixen Looks: Navy+Gold-Tokens, Sektions-Struktur, GSAP-Animations-Inventar,
+Personalisierung (genau 3 Stellen), Design-Treue-Check. Quelle: reference/template-spec.md.
+Triggers: Markenfarbe setzen, Design-Treue prüfen, „sieht nicht wie Template aus".
+
+## handwerk-seo-geo
+Local SEO + GEO, Schema.org, robots/sitemap, citable Copy, E-E-A-T. Quelle: reference/geo-seo-playbook.md.
+Triggers: SEO/GEO, sichtbar machen, Schema/Meta, Audit.
+
+## Geteilte Referenz
+template/                       — DAS fixe Premium-Template (React+Vite+Tailwind+GSAP), npm run dev
+reference/template-spec.md      — fixe Design-/Animations-Spec + Personalisierungs-Map (Scrape→Config)
+reference/geo-seo-playbook.md   — verifizierte SEO+GEO-Wahrheit
+reference/anti-slop.md          — Qualitäts-Guardrails
+reference/resources.md          — Bildaufbereitung (WebP), DSGVO-Fonts, Stock
+reference/trades/dachdecker.md  — Leistungen/Keywords/Trust/Fragen (primär); shk.md, elektriker.md (Gebäudetechnik)
+
+## agents
+agents/dachdecker-site-agent.md — Claude-Code-Subagent für den End-to-End-Lauf

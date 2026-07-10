@@ -1,0 +1,32 @@
+<!-- ================= HERO V2 (Scroll-Scrub, Kairos-Prinzip) =================
+     Ersetzt bei heroVariant:"v2" den kompletten <section class="hero">…</section>-Block
+     der Startseite. Werte kommen aus config/site.js (hero.* + heroV2.*).
+     Zusätzlich einbinden: hero-v2.css im <head>, hero-v2.js vor </body>.
+     Details + Checkliste: README.md in diesem Ordner. -->
+
+<section class="hv2-stage" style="--hv2-img:url('{{heroV2.image}}'); --hv2-focus-y:{{heroV2.focusY}};">
+  <div class="hv2-sticky">
+    <div class="hv2-img"></div>
+    <div class="hv2-scrim"></div>
+    <div class="hv2-haze-bottom"></div>
+    <div class="hv2-haze-blur"></div>
+
+    <!-- Wortmarke: Betriebsname, KURZ (ideal <= 8 Zeichen, sonst font-size senken) -->
+    <div class="hv2-wordmark">{{heroV2.wordmark}}</div>
+
+    <div class="hv2-copy">
+      <span class="hv2-eyebrow">{{hero.eyebrow}}</span>
+      <h1 class="hv2-title">{{hero.h1 — Highlight-Wort in <span class="hv2-hl">…</span>}}</h1>
+      <p class="hv2-sub">{{hero.sub}}</p>
+      <div class="hv2-cta-row">
+        <a class="hv2-btn hv2-btn-primary" href="{{hero.button.href}}">{{hero.button.label}}</a>
+        <a class="hv2-btn hv2-btn-ghost" href="/leistungen">Unsere Leistungen</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Marken-Marquee: das .hero-marq-Markup aus v1 hier UNVERÄNDERT einsetzen -->
+<div class="hv2-marq-band">
+  <!-- {{.hero-marq aus v1}} -->
+</div>

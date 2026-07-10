@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.example.de/</loc><changefreq>monthly</changefreq></url>
+  <url><loc>https://www.example.de/ueber-uns</loc><changefreq>monthly</changefreq></url>
+  <url><loc>https://www.example.de/leistungen</loc><changefreq>monthly</changefreq></url>
+  <url><loc>https://www.example.de/karriere</loc><changefreq>monthly</changefreq></url>
+  <url><loc>https://www.example.de/kontakt</loc><changefreq>monthly</changefreq></url>
+</urlset>

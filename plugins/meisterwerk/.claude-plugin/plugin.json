@@ -1,0 +1,20 @@
+{
+  "name": "meisterwerk",
+  "version": "0.3.0",
+  "description": "Meisterwerk — Dachdecker-Website-Werk. Scrapt die bestehende Kundenseite, extrahiert Logo, Markenfarben, Teamfotos & Geschäftsdaten und setzt sie in ein fixes, hochwertiges Premium-Multi-Page-Template (5 Seiten, SSG-prerendered, Navy+Gold, GSAP-Animationen, SEO+GEO) ein — ohne dass Design oder Animationen leiden. Inkl. Qualitäts-Kontrolle. Fokus Dachdecker, optional Gebäudetechnik.",
+  "author": {
+    "name": "Kairos Digital"
+  },
+  "homepage": "https://github.com/kairos-digital/meisterwerk",
+  "keywords": [
+    "dachdecker",
+    "handwerk",
+    "website",
+    "template",
+    "scrape",
+    "personalisierung",
+    "seo",
+    "geo",
+    "gsap"
+  ]
+}

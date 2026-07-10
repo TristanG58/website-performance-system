@@ -1,0 +1,20 @@
+{
+  "name": "kairos-plugins",
+  "owner": {
+    "name": "Kairos Digital"
+  },
+  "plugins": [
+    {
+      "name": "meisterwerk",
+      "source": "./meisterwerk",
+      "description": "Ultimativer, SEO+GEO-optimierter Website-Creator für deutsches Handwerk. Spezialisiert sich pro Gewerk und baut mehrseitige Lead-Gen-Sites.",
+      "version": "0.3.0"
+    },
+    {
+      "name": "meisterwerk-miller",
+      "source": "./meisterwerk-miller",
+      "description": "Meisterwerk v2 (Miller-Edition) — Dachdecker-Website-Werk auf Basis der Miller-Struktur: Navy + Steel-Blue, Albert Sans, 3D-Team-Karussell, Sticky-Reveal-Footer, Quiz-Funnel, GSAP-Animationen. Plain HTML/CSS/JS, config-getrieben, 1:1 replizierbar.",
+      "version": "2.1.0"
+    }
+  ]
+}
