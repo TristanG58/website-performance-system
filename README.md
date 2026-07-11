@@ -36,6 +36,26 @@ Registriert über `plugins/.claude-plugin/marketplace.json`
 (Marketplace `kairos-plugins`). Zur Level-Konvention siehe
 [`docs/decisions/0001-template-level-convention.md`](docs/decisions/0001-template-level-convention.md).
 
+## Owner & Marke
+
+GitHub-Owner und Produktmarke sind **getrennte Konzepte**:
+
+- **Technischer GitHub-Owner:** `TristanG58` — das Repository liegt unter
+  <https://github.com/TristanG58/website-performance-system>. Repository-Links
+  (z. B. `homepage` in den Plugin-Manifesten) zeigen auf diese reale URL.
+- **Organisation / Produktmarke:** `Kairos Digital` — bleibt als Marketplace-Owner
+  bzw. Markenname bestehen (`plugins/.claude-plugin/marketplace.json`).
+
+## Register
+
+- `registry/templates.json` — Template-Register, validiert durch
+  `registry/templates.schema.json`.
+- `registry/clients.schema.json` — Schema für das *zukünftige* Kundenregister; die
+  spätere `clients.json` verwendet die Root-Struktur `{ "schemaVersion", "clients": [] }`
+  (in dieser Phase noch nicht angelegt).
+- **Capability Tiers** sind kontrollierte Werte — `standard`, `premium`, `advanced`
+  — und **unabhängig** von der Template-Level-Zahl.
+
 ## Aktueller Entwicklungsstatus
 
 Frühe Aufbauphase. Vorhanden: beide Plugins (sanitisiert importiert), diese

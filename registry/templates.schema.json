@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/TristanG58/website-performance-system/registry/templates.schema.json",
+  "title": "Template registry",
+  "description": "Schema für registry/templates.json. Validiert die vorhandenen Template-Level. capabilityTier ist unabhängig von der Level-Zahl.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "templates"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "description": "Version dieses Registerformats (SemVer)."
+    },
+    "templates": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/template" }
+    }
+  },
+  "$defs": {
+    "template": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "displayName",
+        "plugin",
+        "path",
+        "templatePath",
+        "stack",
+        "capabilityTier",
+        "status",
+        "versionSource",
+        "supportsHeadlessCms",
+        "supportsConsentManagement",
+        "notes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stabiler Level-Identifier. Die Level-Zahl ist Bau-/Produktreihenfolge, nicht Komplexität.",
+          "pattern": "^level-[1-9][0-9]*$"
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Sprechender Anzeigename."
+        },
+        "plugin": {
+          "type": ["string", "null"],
+          "description": "Plugin-Verzeichnisname unter plugins/ oder null (noch nicht vorhanden)."
+        },
+        "path": {
+          "type": ["string", "null"],
+          "description": "Pfad zum Plugin oder null."
+        },
+        "templatePath": {
+          "type": ["string", "null"],
+          "description": "Pfad zum Template-Verzeichnis oder null."
+        },
+        "stack": {
+          "type": "array",
+          "description": "Konkrete Technologien.",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "capabilityTier": {
+          "type": "string",
+          "description": "Fähigkeitsstufe, unabhängig von der Level-Zahl.",
+          "enum": ["standard", "premium", "advanced"]
+        },
+        "status": {
+          "type": "string",
+          "description": "Reifegrad des Templates.",
+          "enum": ["active", "deprecated", "planned"]
+        },
+        "versionSource": {
+          "type": ["string", "null"],
+          "description": "Pfad zur maßgeblichen Versionsquelle (plugin.json) oder null."
+        },
+        "supportsHeadlessCms": {
+          "type": "boolean",
+          "description": "Ob das Template ein Headless-CMS anbindet."
+        },
+        "supportsConsentManagement": {
+          "type": "boolean",
+          "description": "Ob das Template ein Consent-/Cookie-Management integriert."
+        },
+        "notes": {
+          "type": "array",
+          "description": "Freitext-Hinweise.",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

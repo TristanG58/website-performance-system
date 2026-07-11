@@ -40,6 +40,13 @@ zusätzlich beschreibende Felder:
   dass eine höhere Level-Zahl mehr Komplexität/Qualität bedeutet.
 - `capabilityTier` und `status` sind die maßgeblichen Felder für Auswahl-/
   Automatisierungslogik, nicht die Level-Zahl.
+- **`capabilityTier` ist ein kontrollierter Wert** (im Register-Schema als Enum
+  erzwungen), **unabhängig** von der Level-Zahl:
+  - `standard` — schlanke, einfache Website-Lösung
+  - `premium` — visuell und technisch umfangreicheres Template
+  - `advanced` — höchste Architektur-, Integrations- und Skalierungsstufe
+- GitHub-Owner (`TristanG58`) und Produktmarke (`Kairos Digital`) sind getrennte
+  Konzepte; Details in `README.md` und `docs/architecture/system-overview.md`.
 - Level 3 ist reserviert und als `planned` geführt; es wird separat entwickelt
   und später angebunden.
 - Der Produktname „Miller" (Level 2) bleibt vorerst erhalten und kann später

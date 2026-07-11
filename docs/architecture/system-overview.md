@@ -88,6 +88,20 @@ Grundsatz: **Research und Bewertung ändern nichts.** Codeänderungen sind eng
 abgegrenzt und reversibel. Nach außen wirkende Schritte (Deployment) erfolgen erst
 nach expliziter Freigabe und ausschließlich im jeweiligen Kunden-Kontext.
 
+## Konventionen (Owner, Marke, Capability Tiers)
+
+- **GitHub-Owner ≠ Produktmarke.** Technischer Owner ist `TristanG58`
+  (Repository: <https://github.com/TristanG58/website-performance-system>);
+  Produktmarke/Marketplace-Owner bleibt `Kairos Digital`. Repository-Links zeigen
+  stets auf die reale Repo-URL.
+- **Capability Tiers sind kontrollierte Werte:** `standard`, `premium`, `advanced`.
+  Sie sind **unabhängig** von der Template-Level-Zahl — die Level-Zahl beschreibt
+  Bau-/Produktreihenfolge, **nicht** Qualität oder Komplexität
+  (siehe `docs/decisions/0001-template-level-convention.md`).
+- **Kundenregister-Form:** die zukünftige `clients.json` verwendet die Root-Struktur
+  `{ "schemaVersion", "clients": [] }` (validiert durch `registry/clients.schema.json`;
+  in dieser Phase noch nicht angelegt).
+
 ## Kopplung ohne gemeinsame Laufzeit
 
 Templates sind versioniert; jede Kunden-Site notiert im Register, welches
