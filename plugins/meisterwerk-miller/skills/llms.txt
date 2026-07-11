@@ -5,7 +5,7 @@ in das fixe Premium-Template einsetzen → prüfen. Design & Animationen sind fi
 
 ## handwerk-site-builder
 Orchestrator: Scrape (Firecrawl) → Extraktion (Logo/Farben/Fotos/NAP/Leistungen/Bewertungen)
-→ Template klonen → config/site.ts + Markenfarbe + Bilder personalisieren → SEO/GEO → Build → Browser-QC.
+→ Template klonen → config/site.js + Markenfarbe + Bilder personalisieren → SEO/GEO → Build (node build.mjs) → Browser-QC.
 Triggers: Meisterwerk, Dachdecker-Seite bauen, Website für [Betrieb], bestehende Seite relaunchen, [URL].
 
 ## handwerk-design-system
@@ -18,7 +18,7 @@ Local SEO + GEO, Schema.org, robots/sitemap, citable Copy, E-E-A-T. Quelle: refe
 Triggers: SEO/GEO, sichtbar machen, Schema/Meta, Audit.
 
 ## Geteilte Referenz
-template/                       — DAS fixe Premium-Template (React+Vite+Tailwind+GSAP), npm run dev
+template/                       — DAS fixe Miller-Template (plain HTML/CSS/JS + GSAP via CDN), node build.mjs
 reference/template-spec.md      — fixe Design-/Animations-Spec + Personalisierungs-Map (Scrape→Config)
 reference/geo-seo-playbook.md   — verifizierte SEO+GEO-Wahrheit
 reference/anti-slop.md          — Qualitäts-Guardrails

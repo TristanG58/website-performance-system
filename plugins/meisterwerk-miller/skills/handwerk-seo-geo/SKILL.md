@@ -20,11 +20,11 @@ SEO/GEO-Discovery vor dem Build, Aufbau des SEO/GEO-Layers (Schema, Meta, Sitema
 
 **Related skills:** `handwerk-site-builder` (ruft diese Skill in Phase 3 + 7), `pro-copywriter` (für die eigentliche Textproduktion).
 
-## Im Meisterwerk-Template (Multi-Page, 5 Seiten) umgesetzt
-Das Template ist eine SSG-Multi-Page-Site mit **5 echten URLs** (`/`, `/leistungen`, `/projekte`, `/ueber-uns`, `/kontakt`) — jede wird zu statischem HTML prerendered (crawlbar ohne JS). Der SEO/GEO-Layer ist **datengetrieben**, du pflegst nur `src/config/site.ts`:
-- **Per-Page Title/Description/Canonical/OG:** `seo.pages.*` (je eindeutig) → ausgespielt von `<Seo>` (`src/components/site/seo.tsx`) via Head. **`seo.siteUrl` = echte Domain** (canonical/OG/Sitemap hängen daran).
-- **JSON-LD (eingebaut):** `RoofingContractor`/LocalBusiness sitewide, `OfferCatalog`+`Service` auf `/leistungen`, `FAQPage` auf `/kontakt`, `AggregateRating` aus `business.rating` (nur echt!), `areaServed` aus `geo.areaServed`.
-- **`public/sitemap.xml` (5 URLs) + `public/robots.txt` (AI-Bots erlaubt):** Platzhalter-Domain auf `seo.siteUrl` setzen.
+## Im Miller-Template (Multi-Page, 5 statische Seiten) umgesetzt
+Das Template ist eine statische Multi-Page-Site aus **plain HTML/CSS/JS** mit **5 echten URLs** (`/`, `/leistungen`, `/ueber-uns`, `/karriere`, `/kontakt`) — jede ist ein eigenes `index.html` (crawlbar ohne JS). Der SEO/GEO-Layer ist **datengetrieben**, du pflegst `config/site.js`; `build.mjs` injiziert Theme/Domain und generiert robots/sitemap:
+- **Per-Page Title/Description/Canonical/OG:** `seo.pages.*` (je eindeutig) → als `<title>`, `<meta name="description">`, `<link rel="canonical">` und OG-Tags im `<head>` jeder `index.html`. **`seo.siteUrl` = echte Domain** (canonical/OG/Sitemap hängen daran).
+- **JSON-LD (statisch im HTML als `<script type="application/ld+json">`):** `RoofingContractor`/LocalBusiness sitewide, `OfferCatalog`+`Service` auf `/leistungen`, `FAQPage` auf der Seite mit den sichtbaren Q&A, `AggregateRating` aus `business`-Bewertung (nur echt!), `areaServed` aus `geo.areaServed`.
+- **`public/sitemap.xml` + `public/robots.txt` (AI-Bots erlaubt):** von `build.mjs` aus `seo.siteUrl` bzw. `nav` erzeugt.
 - **NAP** im Footer jeder Seite (geteiltes Layout) + interne Verlinkung Start→Leistungen→Kontakt ist angelegt.
 
 ## Grundprinzip (nicht überhören)
@@ -56,7 +56,7 @@ Jeder Seitenabschnitt enthält mind. **eine** Statistik, Quelle oder ein Zitat. 
 
 ## Technical
 - **robots.txt:** Search-/Antwort-Bots explizit erlauben (`Googlebot`, `Bingbot`, `OAI-SearchBot`, `PerplexityBot`, `ChatGPT-User`, `Perplexity-User`, `ClaudeBot`). Fertige Vorlage im Playbook. Prüfen, dass CDN/Firewall AI-Bots nicht heimlich blockt.
-- **Sitemap.xml** sauber, alle 5 Kernseiten (`/`, `/leistungen`, `/projekte`, `/ueber-uns`, `/kontakt`) mit echter Domain.
+- **Sitemap.xml** sauber, alle 5 Kernseiten (`/`, `/leistungen`, `/ueber-uns`, `/karriere`, `/kontakt`) mit echter Domain.
 - **llms.txt:** optional, **kein** echter Hebel — nicht als AI-Boost verkaufen. Priorität: robots.txt ≫ Sitemap ≫ (optional) llms.txt.
 - **Core Web Vitals:** LCP ≤ 2,5 s, INP ≤ 200 ms, CLS ≤ 0,1. Mobile-first, Telefonnummer als `tel:`-Link.
 

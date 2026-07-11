@@ -5,7 +5,7 @@ in das fixe Premium-Template einsetzen → prüfen. Design & Animationen sind fi
 
 ## handwerk-site-builder
 Orchestrator: Scrape (Firecrawl) → Extraktion (Logo/Farben/Fotos/NAP/Leistungen/Bewertungen)
-→ Template klonen → config/site.ts + Markenfarbe + Bilder personalisieren → SEO/GEO → Build → Browser-QC.
+→ Template klonen → src/config/site.ts + Markenfarbe + Bilder personalisieren → SEO/GEO → Build → Browser-QC.
 Triggers: Meisterwerk, Dachdecker-Seite bauen, Website für [Betrieb], bestehende Seite relaunchen, [URL].
 
 ## handwerk-design-system
