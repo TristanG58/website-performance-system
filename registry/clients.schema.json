@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/TristanG58/website-performance-system/registry/clients.schema.json",
+  "title": "Client registry",
+  "description": "Schema für das zukünftige Kundenregister (clients.json). Enthält bewusst KEINE personenbezogenen Daten, Secrets, API-Keys oder vollständigen Zugangsdaten. Repository darf eine URL ODER ein eindeutiger Repository-Identifier sein. Noch keine Kundendaten in diesem Repository.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "clients"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "description": "Version dieses Registerformats (SemVer)."
+    },
+    "clients": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/client" }
+    }
+  },
+  "$defs": {
+    "client": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["clientId", "displayName", "repository", "templateId", "status"],
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "Stabiler, technischer Identifier (kebab-case). Keine personenbezogenen Daten.",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Anzeigename des Projekts/Betriebs."
+        },
+        "repository": {
+          "type": "string",
+          "description": "Repository-URL ODER eindeutiger Repository-Identifier. Keine Zugangsdaten."
+        },
+        "templateId": {
+          "type": "string",
+          "description": "Referenz auf registry/templates.json (z. B. level-1, level-2).",
+          "enum": ["level-1", "level-2", "level-3"]
+        },
+        "templateVersion": {
+          "type": ["string", "null"],
+          "description": "Template-Version, gegen die die Site gebaut wurde."
+        },
+        "framework": {
+          "type": ["string", "null"],
+          "description": "Konkretes Framework/Stack der Site."
+        },
+        "hosting": {
+          "type": ["string", "null"],
+          "description": "Hosting-Ziel (z. B. Vercel, Netlify) — nur Bezeichner, keine Secrets."
+        },
+        "cms": {
+          "type": ["string", "null"],
+          "description": "Angebundenes (Headless-)CMS oder null."
+        },
+        "consentSystem": {
+          "type": ["string", "null"],
+          "description": "Consent-/Cookie-Management-System oder null."
+        },
+        "customizations": {
+          "type": "array",
+          "description": "Kundenspezifische Abweichungen vom Template (Kurzbeschreibungen).",
+          "items": { "type": "string" }
+        },
+        "enabledModules": {
+          "type": "array",
+          "description": "Aktivierte Shared-Module (z. B. seo, analytics).",
+          "items": { "type": "string" }
+        },
+        "lastAudit": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Zeitpunkt des letzten Audits (ISO 8601) oder null."
+        },
+        "lastMigration": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Zeitpunkt der letzten Migration (ISO 8601) oder null."
+        },
+        "updatePolicy": {
+          "type": "string",
+          "description": "Wie Updates auf diese Site ausgerollt werden dürfen.",
+          "enum": ["manual", "scheduled", "critical-only"]
+        },
+        "stagingAvailable": {
+          "type": "boolean",
+          "description": "Ob eine Staging-Umgebung existiert."
+        },
+        "rollbackAvailable": {
+          "type": "boolean",
+          "description": "Ob ein Rollback-Mechanismus existiert."
+        },
+        "status": {
+          "type": "string",
+          "description": "Lebenszyklus-Status des Kundenprojekts.",
+          "enum": ["active", "maintenance", "archived"]
+        }
+      }
+    }
+  }
+}

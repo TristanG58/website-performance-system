@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0.0",
+  "templates": [
+    {
+      "id": "level-1",
+      "displayName": "Meisterwerk React",
+      "plugin": "meisterwerk",
+      "path": "plugins/meisterwerk",
+      "templatePath": "plugins/meisterwerk/template",
+      "stack": ["React", "Vite", "TypeScript"],
+      "capabilityTier": "premium",
+      "status": "active",
+      "versionSource": "plugins/meisterwerk/.claude-plugin/plugin.json",
+      "supportsHeadlessCms": false,
+      "supportsConsentManagement": false,
+      "notes": []
+    },
+    {
+      "id": "level-2",
+      "displayName": "Meisterwerk Miller Static",
+      "plugin": "meisterwerk-miller",
+      "path": "plugins/meisterwerk-miller",
+      "templatePath": "plugins/meisterwerk-miller/template",
+      "stack": ["HTML", "CSS", "JavaScript"],
+      "capabilityTier": "standard",
+      "status": "active",
+      "versionSource": "plugins/meisterwerk-miller/.claude-plugin/plugin.json",
+      "supportsHeadlessCms": false,
+      "supportsConsentManagement": false,
+      "notes": [
+        "Product name Miller is currently retained and may be renamed later."
+      ]
+    },
+    {
+      "id": "level-3",
+      "displayName": "Next.js Agency Template",
+      "plugin": null,
+      "path": null,
+      "templatePath": null,
+      "stack": ["Next.js"],
+      "capabilityTier": "advanced",
+      "status": "planned",
+      "versionSource": null,
+      "supportsHeadlessCms": true,
+      "supportsConsentManagement": true,
+      "notes": [
+        "Will be developed separately and connected later."
+      ]
+    }
+  ]
+}
