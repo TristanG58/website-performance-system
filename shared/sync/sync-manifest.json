@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "1.0.0",
+  "entries": [
+    {
+      "id": "design-anti-slop",
+      "source": "shared/knowledge/design/anti-slop.md",
+      "targets": [
+        "plugins/meisterwerk/reference/anti-slop.md",
+        "plugins/meisterwerk-miller/reference/anti-slop.md"
+      ],
+      "mode": "copy"
+    },
+    {
+      "id": "design-tokens-schema",
+      "source": "shared/knowledge/design/design-tokens-schema.md",
+      "targets": [
+        "plugins/meisterwerk/reference/design-tokens-schema.md",
+        "plugins/meisterwerk-miller/reference/design-tokens-schema.md"
+      ],
+      "mode": "copy"
+    },
+    {
+      "id": "design-resources",
+      "source": "shared/knowledge/design/resources.md",
+      "targets": [
+        "plugins/meisterwerk/reference/resources.md",
+        "plugins/meisterwerk-miller/reference/resources.md"
+      ],
+      "mode": "copy"
+    },
+    {
+      "id": "seo-geo-playbook",
+      "source": "shared/knowledge/seo-geo/geo-seo-playbook.md",
+      "targets": [
+        "plugins/meisterwerk/reference/geo-seo-playbook.md",
+        "plugins/meisterwerk-miller/reference/geo-seo-playbook.md"
+      ],
+      "mode": "copy"
+    },
+    {
+      "id": "trades-template",
+      "source": "shared/knowledge/trades/_template.md",
+      "targets": [
+        "plugins/meisterwerk/reference/trades/_template.md",
+        "plugins/meisterwerk-miller/reference/trades/_template.md"
+      ],
+      "mode": "copy"
+    },
+    {
+      "id": "trades-dachdecker",
+      "source": "shared/knowledge/trades/dachdecker.md",
+      "targets": [
+        "plugins/meisterwerk/reference/trades/dachdecker.md",
+        "plugins/meisterwerk-miller/reference/trades/dachdecker.md"
+      ],
+      "mode": "copy"
+    },
+    {
+      "id": "trades-elektriker",
+      "source": "shared/knowledge/trades/elektriker.md",
+      "targets": [
+        "plugins/meisterwerk/reference/trades/elektriker.md",
+        "plugins/meisterwerk-miller/reference/trades/elektriker.md"
+      ],
+      "mode": "copy"
+    },
+    {
+      "id": "trades-fliesenleger",
+      "source": "shared/knowledge/trades/fliesenleger.md",
+      "targets": [
+        "plugins/meisterwerk/reference/trades/fliesenleger.md",
+        "plugins/meisterwerk-miller/reference/trades/fliesenleger.md"
+      ],
+      "mode": "copy"
+    },
+    {
+      "id": "trades-galabau",
+      "source": "shared/knowledge/trades/galabau.md",
+      "targets": [
+        "plugins/meisterwerk/reference/trades/galabau.md",
+        "plugins/meisterwerk-miller/reference/trades/galabau.md"
+      ],
+      "mode": "copy"
+    },
+    {
+      "id": "trades-kfz",
+      "source": "shared/knowledge/trades/kfz.md",
+      "targets": [
+        "plugins/meisterwerk/reference/trades/kfz.md",
+        "plugins/meisterwerk-miller/reference/trades/kfz.md"
+      ],
+      "mode": "copy"
+    },
+    {
+      "id": "trades-maler",
+      "source": "shared/knowledge/trades/maler.md",
+      "targets": [
+        "plugins/meisterwerk/reference/trades/maler.md",
+        "plugins/meisterwerk-miller/reference/trades/maler.md"
+      ],
+      "mode": "copy"
+    },
+    {
+      "id": "trades-shk",
+      "source": "shared/knowledge/trades/shk.md",
+      "targets": [
+        "plugins/meisterwerk/reference/trades/shk.md",
+        "plugins/meisterwerk-miller/reference/trades/shk.md"
+      ],
+      "mode": "copy"
+    },
+    {
+      "id": "trades-tischler",
+      "source": "shared/knowledge/trades/tischler.md",
+      "targets": [
+        "plugins/meisterwerk/reference/trades/tischler.md",
+        "plugins/meisterwerk-miller/reference/trades/tischler.md"
+      ],
+      "mode": "copy"
+    }
+  ]
+}
