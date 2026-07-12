@@ -1,3 +1,12 @@
+/* Self-hosted Albert Sans — variable, latin, Gewichte 400–800 (SIL OFL 1.1).
+   Ersetzt Google Fonts; keine externen Runtime-Requests. */
+@font-face{
+  font-family:'Albert Sans';
+  font-style:normal;
+  font-weight:400 800;
+  font-display:swap;
+  src:url('/assets/fonts/albert-sans-variable.woff2') format('woff2');
+}
 :root{
   --dark:#1C3F60;        /* color-kit dark (navy) */
   --light:#F5F8FB;       /* color-kit light */

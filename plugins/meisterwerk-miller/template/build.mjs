@@ -69,3 +69,46 @@ if (consent.enabled === false) {
   }
   console.log(`\n  ✓ Consent-Integration vollstaendig (5 Seiten, Head+Trigger+Output, enabled=${consent.enabled}).`);
 }
+
+/* ==========================================================================
+ *  Self-Host-Validierung (Level 2): Fonts + GSAP lokal, keine externen Hosts.
+ * ========================================================================== */
+const FORBIDDEN_HOSTS = ["fonts.googleapis.com", "fonts.gstatic.com", "cdnjs.cloudflare.com"];
+const LOCAL_ASSETS = [
+  "assets/fonts/albert-sans-variable.woff2",
+  "assets/vendor/gsap/gsap.min.js",
+  "assets/vendor/gsap/ScrollTrigger.min.js",
+];
+const sh = [];
+
+// 1) Lokale Quell- + Output-Assets vorhanden
+for (const a of LOCAL_ASSETS) {
+  if (!existsSync(join(HERE, a))) sh.push(`Quelle fehlt: ${a}`);
+  if (!existsSync(join(OUT, a))) sh.push(`Output fehlt: ${a} (render-all assets-copy?)`);
+}
+
+// 2) styles.css (Output): lokales @font-face + font-display:swap + lokaler Pfad, kein externer Host
+const outCss = existsSync(join(OUT, "styles.css")) ? readFileSync(join(OUT, "styles.css"), "utf8") : "";
+if (!/@font-face/.test(outCss)) sh.push("styles.css: kein @font-face");
+if (!/font-display:\s*swap/.test(outCss)) sh.push("styles.css: kein font-display:swap");
+if (!outCss.includes("/assets/fonts/albert-sans-variable.woff2")) sh.push("styles.css: lokaler Font-Pfad fehlt");
+for (const host of FORBIDDEN_HOSTS) if (outCss.includes(host)) sh.push(`styles.css: externer Host ${host}`);
+
+// 3) Jede gerenderte Seite: keine verbotenen Hosts, lokale GSAP-Pfade, ScrollTrigger NACH gsap, lokaler Font
+for (const rel of PAGES) {
+  const html = readFileSync(join(OUT, rel), "utf8");
+  for (const host of FORBIDDEN_HOSTS) if (html.includes(host)) sh.push(`${rel}: externer Host ${host}`);
+  const gi = html.indexOf("/assets/vendor/gsap/gsap.min.js");
+  const si = html.indexOf("/assets/vendor/gsap/ScrollTrigger.min.js");
+  if (gi < 0) sh.push(`${rel}: gsap.min.js (lokal) fehlt`);
+  if (si < 0) sh.push(`${rel}: ScrollTrigger.min.js (lokal) fehlt`);
+  if (gi >= 0 && si >= 0 && si < gi) sh.push(`${rel}: ScrollTrigger vor gsap geladen`);
+  if (!html.includes("/assets/fonts/albert-sans-variable.woff2")) sh.push(`${rel}: lokaler Font-Preload fehlt`);
+}
+
+if (sh.length) {
+  console.error("\n  ✗ Self-Host-Validierung fehlgeschlagen:");
+  for (const p of sh) console.error("     - " + p);
+  process.exit(1);
+}
+console.log("  ✓ Self-Host vollstaendig (Fonts + GSAP lokal, keine externen Hosts, 5 Seiten + styles.css).");
