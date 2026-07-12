@@ -1,6 +1,6 @@
 {
   "name": "meisterwerk-miller",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Meisterwerk v2 (Miller-Edition): baut Dachdecker-Websites im Miller-Stil. Scrapt die bestehende Kundenseite und setzt Logo, Markenfarben, Fotos & Daten in ein fixes plain-HTML/CSS/JS-Template ein — Navy + Steel-Blue, Albert Sans, Quiz-Funnel, 3D-Team-Karussell, Minimal-FAQ, Sticky-Reveal-Footer, GSAP-Animationen. Config-getrieben (config/site.js), 1:1 replizierbar, Multi-Page (Home/Leistungen/Ueber-uns/Karriere/Kontakt), SEO/GEO und Qualitaets-Kontrolle.",
   "author": {
     "name": "Kairos Digital"

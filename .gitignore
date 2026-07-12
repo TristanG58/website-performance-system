@@ -78,3 +78,8 @@ pnpm-debug.log*
 Thumbs.db
 ehthumbs.db
 desktop.ini
+
+# ── Render-Output + reale Verifikations-Fixtures (nie committen) ──────────
+**/template/site/
+site.*.real.js
+*.real.js

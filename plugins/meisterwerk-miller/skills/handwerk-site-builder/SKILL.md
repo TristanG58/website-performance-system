@@ -16,9 +16,13 @@ allowed-tools: Read, Write, Edit, Grep, Glob, Bash, WebFetch
 # Meisterwerk v2 (Miller) — Scrape → Personalisieren → Bauen → Prüfen
 
 Du baust keine Website von Grund auf neu. Du nimmst das **fertige, fixe Miller-Template** (plain
-HTML/CSS/JS, config-getrieben über `config/site.js`) und füllst es mit den echten Daten des Kunden
-— gewonnen aus dessen bestehender Website. Design und Animationen bleiben **unangetastet**. Ergebnis:
-eine konsistent hochwertige Dachdecker-Site im Miller-Stil, personalisiert in Minuten.
+HTML/CSS/JS, tokenisiert) und füllst es mit den echten Daten des Kunden — gewonnen aus dessen
+bestehender Website. Design und Animationen bleiben **unangetastet**. Ergebnis: eine konsistent
+hochwertige Dachdecker-Site im Miller-Stil, personalisiert in Minuten.
+
+> **KERNREGEL: HTML-Dateien werden NIE von Hand bearbeitet.** Die einzige pro Kunde bearbeitete Datei
+> ist **`config/site.js`**. Ein Renderer (`node render-all.mjs`, zero-dependency) füllt daraus die
+> tokenisierten Seiten. Feld-Referenz: **`reference/tokens.md`**. „Nichts erfinden, Lücken markieren" bleibt.
 
 Fokus: **Dachdecker** (optional Gebäudetechnik → `reference/trades/shk.md` bzw. `elektriker.md`).
 
@@ -33,11 +37,12 @@ GSAP + ScrollTrigger via CDN. **Mehr als 5 Seiten gibt es nicht.** Details: `ref
   sagt oder „v1" sagt.
 - **v2 (nur auf Zuruf):** Scroll-Scrub-Hero nach dem Kairos-Prinzip — gepinnter 360vh-Scrub:
   Motiv zoomt heran + dreht leicht, versinkt im Nebel, bild-gefüllte Wortmarke steht allein.
-  NUR verwenden, wenn der Nutzer ausdrücklich „v2", „v2 hero", „Kairos-Hero" oder „Scroll-Hero"
-  sagt. Integration exakt nach **`template/hero-v2/README.md`** (Snippet ersetzt den
-  `<section class="hero">`-Block der Startseite, `hero-v2.css`/`.js` einbinden,
-  `config/site.js → heroVariant:"v2"` + `heroV2.*` füllen, Motiv als `public/hero-v2.webp`).
-  Timings/Choreografie sind fix. Alle anderen Seiten und Sektionen bleiben unverändert.
+  NUR verwenden, wenn der Nutzer ausdrücklich „v2", „v2 hero", „Kairos-Hero" oder „Scroll-Hero" sagt.
+  **Kein manuelles Hero-Ersetzen — die Weiche steckt im Template.** Setze `config/site.js →
+  heroVariant:"v2"` und fülle `heroV2.*` (`image`, `wordmark` ≤ ~8 Zeichen, `focusY`, optional
+  `accent`). `render-all.mjs` schaltet dann automatisch den v2-Hero, die `hero-v2.css`/`.js`-Includes,
+  den Bild-Preload und das Marquee-Band um. Timings/Choreografie sind fix; alle anderen Seiten
+  und Sektionen bleiben unverändert. Hintergrund: `template/hero-v2/README.md`.
 
 ## Schwester-Skills & Referenzen (laden)
 - `handwerk-design-system` + **`reference/template-spec.md`** → was fix ist + Personalisierungs-Map.
@@ -62,21 +67,32 @@ herunterladen), echte Bewertungen, USP/Claims/Über-uns, Einzugsgebiet, Notdiens
 Speichern: `research/01-extrakt.md` (+ Assets nach `assets/`). **Nichts erfinden** — Lücken markieren.
 
 ## PHASE 2 — Template klonen
-Plugin-`template/` in den Projektordner (`site/`) kopieren. Unveränderter Premium-Build.
+Plugin-`template/` in den Projektordner (`site/`) kopieren — inkl. `render.mjs`, `render-all.mjs`,
+den **tokenisierten** Seiten, `styles.css`, `main.js`, `hero-v2/`, `assets/`, `public/`.
+Unverändert übernehmen. **HTML nie anfassen.**
 
-## PHASE 3 — Personalisieren (genau die 4 Stellen aus template-spec.md)
-1. **`config/site.js`** — die EINZIGE Daten-Datei. Füllen: `business` (NAP), `hero`, `brands`,
-   `aboutIntro`, `quiz`, `services`, `vorteile`, `team` (Foto+Rolle+Bio je Person), `faq`, `about`,
-   `karriere`, `geo.areaServed`, **`seo.siteUrl`** + **`seo.pages.*`** (je eindeutiger Title/Description).
-   Fehlende Inhalte faktentreu aus `reference/trades/dachdecker.md` — **nichts erfinden**.
-2. **`config/site.js` → `theme`** (bzw. `styles.css :root`) — `dark`/`key1` auf die Markenfarbe
-   (Hex, Navy-Charakter wahren). `node build.mjs` schreibt sie in `styles.css`.
-3. **Bilder / Logo** — Kundenbilder unter den Pfaden aus `config/site.js` ablegen (WebP), Logo einsetzen.
-4. **Domain** — `seo.siteUrl` setzen; `node build.mjs` aktualisiert `robots.txt` + `sitemap.xml` (5 URLs).
+## PHASE 3 — Personalisieren = NUR `config/site.js` füllen
+**Es gibt genau EINE zu bearbeitende Datei: `config/site.js`.** Danach rendert `node render-all.mjs`
+die fertigen Seiten. Feld-Referenz: **`reference/tokens.md`** (76 Skalare · 25 REPEAT-Blöcke · 3 IF-Blöcke).
 
-Danach die Content-Werte aus `config/site.js` in die HTML-Partials übernehmen (Personalisierungs-Map
-in `template-spec.md` Schritt für Schritt; NAP/Hero/Listen). **Tabu:** Struktur/Layout/Animationen/
-Signatur-Komponenten/Tokens außer Markenfarben.
+1. **`config/site.js` mit den gescrapten Daten füllen** — alle Felder gemäß `reference/tokens.md`:
+   `business` (NAP: name/logo/phone/phoneHref/email/addr/addrShort/copyright/mapTitle/mapEmbed/social),
+   `hero` (+ `titleLines`/`titleAria`), `brands[]`, `aboutIntro` (+ `images[]`), `quiz.bg`,
+   `services[]` (title/titleDetail/teaser/detail/imgAlt/`bullets`), `vorteile` (rating/reasons/gallery),
+   `team.members[]` (idx/img/alt/name/role/bio), `faq.items[]`, `about` (story/values/stats),
+   `karriere` (perks/jobs), `geo.areaServed`, **`seo.siteUrl`** + **`seo.pages.*`** (je eindeutiger Title/Description).
+   Fehlende Inhalte faktentreu aus `reference/trades/dachdecker.md` — **nichts erfinden, Lücken markieren**.
+2. **Markenfarbe** → `config/site.js → theme` (`dark`/`key1` auf die Kunden-Marke, Navy-Charakter
+   wahren). `render-all.mjs` injiziert Theme **plus** Home-Hero-BG (`hero.bg`) + Quiz-BG (`quiz.bg`) in `styles.css`.
+3. **Bilder / Logo** — als **URLs** in die passenden Config-Felder (`business.logo`, `hero.bg`,
+   `services[].img`, `team.members[].img`, `about.*`, `brands[].src`, `aboutIntro.images[].src` …).
+   Aufbereitung (WebP/DSGVO): `reference/resources.md`.
+4. **Domain** → `seo.siteUrl` setzen; `render-all.mjs` generiert `robots.txt` + `sitemap.xml` (5 URLs) daraus.
+
+**Danach: `node render-all.mjs`** → schreibt die fertigen HTML-Seiten + Assets nach `site/`.
+**Tabu:** Struktur/Layout/CSS-Klassen/Animationen/Signatur-Komponenten (3D-Team-Karussell,
+Sticky-Footer, Quiz-Funnel, Marquee)/Sektionsreihenfolge — alles fix. Personalisiert wird
+**ausschließlich `config/site.js`** (+ Theme-Farben, Bild-URLs). HTML-Partials werden **nie** von Hand editiert.
 
 ## PHASE 4 — SEO/GEO-Layer
 `handwerk-seo-geo` anwenden. Pro Seite eindeutiger `<title>` + Description (aus `seo.pages.*`),
@@ -84,9 +100,11 @@ Signatur-Komponenten/Tokens außer Markenfarben.
 **Service/OfferCatalog** auf `/leistungen`, **FAQPage** (nur echte Fragen), `sitemap.xml` (5 URLs) +
 `robots.txt` mit echter Domain, lokale Keywords (Dienstleistung + Ort) in Title/H1.
 
-## PHASE 5 — Bauen
-`node build.mjs` (Theme + robots/sitemap). Vorschau: `python3 -m http.server 4322` im `site/`-Ordner.
-Kein npm-Build nötig — die Seiten sind statisch. Für Deploy siehe Phase 7.
+## PHASE 5 — Rendern
+`node render-all.mjs` — füllt die tokenisierten Seiten aus `config/site.js`, injiziert Theme +
+Hero-/Quiz-BG in `styles.css` und generiert `robots.txt` + `sitemap.xml` (5 URLs). Schreibt alles
+nach `site/`. Vorschau: `python3 -m http.server 4322` im `site/`-Ordner. Kein npm-Build nötig — die
+Seiten sind statisch. (`node build.mjs` ist ein Alias auf `render-all.mjs`.) Für Deploy siehe Phase 7.
 
 ## PHASE 6 — Qualitäts-Kontrolle (Pflicht, im Browser)
 **Real prüfen** (Dev-Server / Vercel-Preview). Checkliste:
@@ -115,16 +133,17 @@ auf Unterseiten). Übergabe-Notiz: GBP pflegen, echte Bewertungen sammeln, NAP �
 ---
 
 ## Wichtige Regeln
-1. **Template-Design ist fix.** Personalisieren ja, umgestalten nein.
-2. **Immer zuerst die bestehende Seite scrapen** — echte Marke/Bilder/Daten schlagen Erfindung.
-3. **Nichts erfinden.** Keine Fake-Bewertungen/Kennzahlen; Lücken markieren.
-4. **Browser-QC ist Pflicht.**
-5. **Deploy/Downloads nur mit Freigabe.**
+1. **HTML-Dateien werden NIE von Hand bearbeitet.** Einzige Datenquelle = `config/site.js`; `render-all.mjs` rendert.
+2. **Template-Design ist fix.** Personalisieren ja, umgestalten nein.
+3. **Immer zuerst die bestehende Seite scrapen** — echte Marke/Bilder/Daten schlagen Erfindung.
+4. **Nichts erfinden.** Keine Fake-Bewertungen/Kennzahlen; Lücken markieren.
+5. **Browser-QC ist Pflicht.**
+6. **Deploy/Downloads nur mit Freigabe.**
 
 ## Projektstruktur (Ziel)
 ```
 projekt/
 ├─ research/   01-extrakt.md · 02-qc.md
 ├─ assets/     (gescrapte Logos/Fotos)
-└─ site/       (Klon von template/, personalisiert)  → node build.mjs && python3 -m http.server 4322
+└─ site/       (Klon von template/)  → nur config/site.js füllen → node render-all.mjs → python3 -m http.server 4322
 ```
