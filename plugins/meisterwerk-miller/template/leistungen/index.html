@@ -9,6 +9,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800&family=Lora:wght@500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/styles.css" />
+<!-- WPS_CONSENT_HEAD -->
+<link rel="stylesheet" href="/consent/consent.css" />
+<script type="application/json" id="wps-consent-config">
+{"enabled":{{consent.enabled}},"version":"{{consent.version}}","validityDays":{{consent.validityDays}},"storageKey":"{{consent.storageKey}}","eventName":"{{consent.eventName}}","categories":{"necessary":{"enabled":{{consent.categories.necessary.enabled}},"required":{{consent.categories.necessary.required}}},"analytics":{"enabled":{{consent.categories.analytics.enabled}},"required":{{consent.categories.analytics.required}}},"marketing":{"enabled":{{consent.categories.marketing.enabled}},"required":{{consent.categories.marketing.required}}},"externalMedia":{"enabled":{{consent.categories.externalMedia.enabled}},"required":{{consent.categories.externalMedia.required}}}},"services":[],"texts":{"bannerTitle":"{{consent.texts.bannerTitle}}","bannerBody":"{{consent.texts.bannerBody}}","acceptAll":"{{consent.texts.acceptAll}}","acceptNecessary":"{{consent.texts.acceptNecessary}}","settings":"{{consent.texts.settings}}","save":"{{consent.texts.save}}","settingsTitle":"{{consent.texts.settingsTitle}}","settingsIntro":"{{consent.texts.settingsIntro}}","close":"{{consent.texts.close}}","triggerLabel":"{{consent.texts.triggerLabel}}","categories":{"necessary":{"title":"{{consent.texts.categories.necessary.title}}","body":"{{consent.texts.categories.necessary.body}}"},"analytics":{"title":"{{consent.texts.categories.analytics.title}}","body":"{{consent.texts.categories.analytics.body}}"},"marketing":{"title":"{{consent.texts.categories.marketing.title}}","body":"{{consent.texts.categories.marketing.body}}"},"externalMedia":{"title":"{{consent.texts.categories.externalMedia.title}}","body":"{{consent.texts.categories.externalMedia.body}}"}}}}
+</script>
+<script type="module" src="/consent/consent.js"></script>
 <script>if(!matchMedia('(prefers-reduced-motion:reduce)').matches)document.documentElement.classList.add('anim-on')</script>
 </head>
 <body>
@@ -152,7 +158,7 @@
         </div>
         <div class="sf-bottom af" style="--d:.5s">
           <p>{{business.copyright}}</p>
-          <div class="legal"><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a></div>
+          <div class="legal"><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a><!-- WPS_CONSENT_TRIGGER --><button type="button" class="wps-consent-settings-link" data-consent-settings>Cookie-Einstellungen</button></div>
         </div>
       </div>
     </div>

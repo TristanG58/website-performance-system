@@ -1,0 +1,231 @@
+/* ==========================================================================
+ *  consent.css — WPS Level-2 Consent UI (Miller-Edition)
+ *  Alle Selektoren mit Praefix .wps-consent- ; keine globalen Styles ueberschrieben.
+ *  Nutzt bestehende Theme-Variablen (--dark/--light/--key1) mit Fallbacks.
+ * ========================================================================== */
+
+.wps-consent-banner,
+.wps-consent-backdrop,
+.wps-consent-modal {
+  --wps-dark: var(--dark, #1c3f60);
+  --wps-light: var(--light, #f5f8fb);
+  --wps-key: var(--key1, #6a93b0);
+  --wps-ink: #10233a;
+  --wps-line: rgba(16, 35, 58, 0.16);
+  --wps-radius: var(--radius, 8px);
+  box-sizing: border-box;
+  font-family: var(--bodyFont, "Albert Sans"), system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+.wps-consent-banner *,
+.wps-consent-backdrop * {
+  box-sizing: border-box;
+}
+
+/* ---- Banner (nicht blockierend, unten fixiert) -------------------------- */
+.wps-consent-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2147483000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1rem 1.1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  background: var(--wps-light);
+  color: var(--wps-ink);
+  border-top: 3px solid var(--wps-dark);
+  box-shadow: 0 -8px 28px rgba(16, 35, 58, 0.22);
+}
+.wps-consent-banner[hidden] { display: none; }
+
+.wps-consent-banner-title {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--wps-dark);
+  margin-bottom: 0.2rem;
+}
+.wps-consent-banner-body {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--wps-ink);
+}
+.wps-consent-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+/* ---- Buttons ------------------------------------------------------------ */
+.wps-consent-button {
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  line-height: 1.1;
+  padding: 0.7rem 1.15rem;
+  border-radius: var(--wps-radius);
+  border: 2px solid var(--wps-dark);
+  cursor: pointer;
+  min-height: 44px; /* Touch-Target */
+}
+.wps-consent-button--primary {
+  background: var(--wps-dark);
+  color: #fff;
+}
+.wps-consent-button--ghost {
+  background: transparent;
+  color: var(--wps-dark);
+}
+.wps-consent-button--link {
+  background: transparent;
+  color: var(--wps-dark);
+  border-color: transparent;
+  text-decoration: underline;
+  padding-left: 0.6rem;
+  padding-right: 0.6rem;
+}
+.wps-consent-button:hover { filter: brightness(1.06); }
+
+/* ---- Fokus: deutlich sichtbar, nicht nur Farbe --------------------------- */
+.wps-consent-button:focus-visible,
+.wps-consent-checkbox:focus-visible,
+.wps-consent-close:focus-visible,
+.wps-consent-settings-link:focus-visible {
+  outline: 3px solid var(--wps-key);
+  outline-offset: 2px;
+}
+
+/* ---- Backdrop + Modal --------------------------------------------------- */
+.wps-consent-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483001;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  background: rgba(16, 35, 58, 0.55);
+}
+.wps-consent-modal {
+  width: 100%;
+  max-width: 560px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: var(--wps-light);
+  color: var(--wps-ink);
+  border-radius: var(--wps-radius) var(--wps-radius) 0 0;
+  padding: 1.25rem 1.15rem calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -10px 40px rgba(16, 35, 58, 0.35);
+}
+.wps-consent-modal:focus { outline: none; }
+
+.wps-consent-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.4rem;
+}
+.wps-consent-modal-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--wps-dark);
+}
+.wps-consent-close {
+  font: inherit;
+  font-size: 1.6rem;
+  line-height: 1;
+  width: 44px;
+  height: 44px;
+  border: 2px solid transparent;
+  border-radius: var(--wps-radius);
+  background: transparent;
+  color: var(--wps-dark);
+  cursor: pointer;
+}
+.wps-consent-close:hover { background: rgba(16, 35, 58, 0.08); }
+
+.wps-consent-modal-intro {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* ---- Kategorien --------------------------------------------------------- */
+.wps-consent-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 1.1rem;
+}
+.wps-consent-category {
+  border: 1px solid var(--wps-line);
+  border-radius: var(--wps-radius);
+  padding: 0.75rem 0.85rem;
+  background: #fff;
+}
+.wps-consent-category-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  color: var(--wps-dark);
+  cursor: pointer;
+}
+.wps-consent-checkbox {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--wps-dark);
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+.wps-consent-checkbox:disabled { cursor: not-allowed; opacity: 0.75; }
+.wps-consent-category-title { font-size: 0.95rem; }
+.wps-consent-category-body {
+  margin: 0.45rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--wps-ink);
+}
+
+.wps-consent-modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+/* ---- Footer-Trigger ("Cookie-Einstellungen") ---------------------------- */
+.wps-consent-settings-link {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* ---- Desktop ------------------------------------------------------------ */
+@media (min-width: 640px) {
+  .wps-consent-banner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1rem 1.5rem;
+  }
+  .wps-consent-banner-text { flex: 1 1 auto; }
+  .wps-consent-banner-actions { flex: 0 0 auto; }
+  .wps-consent-backdrop { align-items: center; padding: 1.5rem; }
+  .wps-consent-modal { border-radius: var(--wps-radius); }
+}
+
+/* ---- Reduced Motion: keine Uebergaenge ---------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .wps-consent-banner,
+  .wps-consent-modal,
+  .wps-consent-button { transition: none !important; }
+}

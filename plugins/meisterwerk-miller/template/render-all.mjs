@@ -101,7 +101,8 @@ function copyAssets() {
   copy("main.js");
   copy("hero-v2");
   copy("assets");   // lokale Demo-Platzhalter; reale Kunden nutzen externe Bild-URLs
-  log("main.js, hero-v2/, assets/ kopiert");
+  copy("consent");  // WPS Level-2 Consent (consent.js/consent.css) → /consent/ ausliefern
+  log("main.js, hero-v2/, assets/, consent/ kopiert");
 }
 
 renderPages();

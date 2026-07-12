@@ -264,6 +264,42 @@ const SITE = {
       kontakt: { title: "Kontakt – Musterwerk Bedachungen | Dachdecker in Musterstadt", description: "Kontaktieren Sie Musterwerk Bedachungen: Musterstraße 12, 12345 Musterstadt · +49 123 4567890 · info@example.de. Fordern Sie Ihre kostenlose Fachberatung an." },
     },
   },
+
+  /* ---- Consent (WPS Level-2-Consent-Vertrag; siehe docs/architecture/consent.md).
+     Struktur schema-kompatibel; `services` bleibt leer (kein Dienst laedt in dieser Phase).
+     `necessary` ist immer aktiv. Texte sind neutrale DEMO-Texte — KEINE Rechtstexte. ---- */
+  consent: {
+    enabled: true,
+    version: "2026-07-1",
+    validityDays: 182,
+    storageKey: "wps_consent",
+    eventName: "wps:consentchange",
+    categories: {
+      necessary:     { enabled: true,  required: true  },
+      analytics:     { enabled: true,  required: false },
+      marketing:     { enabled: true,  required: false },
+      externalMedia: { enabled: true,  required: false },
+    },
+    services: [],
+    texts: {
+      bannerTitle: "Datenschutz-Einstellungen",
+      bannerBody: "Diese Demo-Website nutzt nur technisch notwendige Speicherungen. Optionale Kategorien für Analyse, Marketing und externe Medien bleiben deaktiviert, bis Sie zustimmen.",
+      acceptAll: "Alle akzeptieren",
+      acceptNecessary: "Nur notwendige",
+      settings: "Einstellungen",
+      save: "Auswahl speichern",
+      settingsTitle: "Datenschutz-Einstellungen",
+      settingsIntro: "Wählen Sie aus, welche optionalen Kategorien Sie zulassen möchten. Ihre Auswahl können Sie jederzeit über den Link im Seitenfuß ändern.",
+      close: "Schließen",
+      triggerLabel: "Cookie-Einstellungen",
+      categories: {
+        necessary:     { title: "Notwendig",      body: "Für den Betrieb der Website erforderlich. Immer aktiv." },
+        analytics:     { title: "Analyse",        body: "Hilft, die Nutzung der Website anonymisiert zu verstehen." },
+        marketing:     { title: "Marketing",      body: "Ermöglicht Werbe- und Remarketing-Funktionen." },
+        externalMedia: { title: "Externe Medien", body: "Erlaubt eingebettete Inhalte wie Karten oder Videos." },
+      },
+    },
+  },
 };
 
 if (typeof module !== "undefined" && module.exports) module.exports = SITE;
