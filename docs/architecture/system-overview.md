@@ -31,6 +31,15 @@ Das zentrale Repository enthält zukünftig:
 | **Migrationen** | versionierte Template-/Config-Transforms | _planned_ |
 | **Tests / Audit** | Build-Smoke, Schema-Validierung, SEO-/Consent-Audit | _planned_ |
 
+## Consent-Architektur
+
+Status: **contract defined** · Implementierung: **planned**. Der stack-neutrale
+Consent-Vertrag für alle Level ist festgeschrieben in
+[`docs/architecture/consent.md`](consent.md), validiert über
+[`shared/schemas/consent-state.schema.json`](../../shared/schemas/consent-state.schema.json)
+und [`shared/schemas/service-registry.schema.json`](../../shared/schemas/service-registry.schema.json).
+Es existiert noch **keine** Consent-Oberfläche oder Loader-Logik.
+
 ## Ist-Zustand (2026-07-10)
 
 ```text

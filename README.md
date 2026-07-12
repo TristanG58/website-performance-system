@@ -63,6 +63,14 @@ Dokumentations- und Registerbasis. **Geplant** (noch nicht vorhanden): `shared/`
 `templates/`, Automatisierungen, Migrationen, gefüllte Kundenregister, Tests.
 Übersicht: [`docs/architecture/system-overview.md`](docs/architecture/system-overview.md).
 
+## Consent-Architektur
+
+Status: **contract defined**, Implementierung noch **planned**. Der stack-neutrale
+Consent-Vertrag ist in [`docs/architecture/consent.md`](docs/architecture/consent.md)
+festgeschrieben und über zwei Schemas validiert:
+[`shared/schemas/consent-state.schema.json`](shared/schemas/consent-state.schema.json)
+und [`shared/schemas/service-registry.schema.json`](shared/schemas/service-registry.schema.json).
+
 ## Sicherheitsprinzipien
 
 - **Keine echten Kundendaten** in diesem Repository — Templates enthalten

@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/TristanG58/website-performance-system/shared/schemas/service-registry.schema.json",
+  "title": "WPS Service Registry",
+  "description": "Deklarative Metadaten der consent-relevanten Dienste einer Website. Ausschließlich serialisierbare Metadaten — KEINE ausführbare Logik. Stack-spezifische Loader werden getrennt implementiert und referenzieren nur bekannte Service-IDs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "services"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Version dieses Registry-Formats (z. B. '1.0.0')."
+    },
+    "services": {
+      "type": "array",
+      "description": "Liste der Dienste. Service-IDs MÜSSEN eindeutig sein — diese Eindeutigkeit wird als Laufzeit-/CI-Regel geprüft (JSON Schema 2020-12 erzwingt Objektfeld-Eindeutigkeit in Arrays nicht zuverlässig).",
+      "items": { "$ref": "#/$defs/service" }
+    }
+  },
+  "$defs": {
+    "service": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "category",
+        "provider",
+        "privacyUrl",
+        "storageWritten",
+        "origins",
+        "enabled",
+        "requiresReloadOnRevoke",
+        "notes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "Stabiler, maschinenlesbarer Bezeichner (kebab-case). Wird von stack-spezifischen Loadern referenziert."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Menschlich lesbarer Anzeigename."
+        },
+        "category": {
+          "type": "string",
+          "enum": ["necessary", "analytics", "marketing", "externalMedia"],
+          "description": "Consent-Kategorie. Der Dienst darf nur geladen werden, wenn diese Kategorie aktiv ist."
+        },
+        "provider": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Anbieter/verantwortliche Stelle."
+        },
+        "privacyUrl": {
+          "type": ["string", "null"],
+          "format": "uri",
+          "description": "Datenschutz-URL des Anbieters. Darf für rein lokale first-party Dienste null sein."
+        },
+        "storageWritten": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string" },
+          "description": "Geschriebene Storage-Schlüssel (Cookies, localStorage, …). Darf leer sein."
+        },
+        "origins": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string" },
+          "description": "Herkünfte, z. B. 'https://www.youtube.com' — Origins, keine vollständigen Script-URLs. Grundlage für CSP und Audits. Darf leer sein."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Ob der Dienst grundsätzlich verfügbar/registriert ist. Deaktivierte Dienste dürfen nie geladen werden."
+        },
+        "requiresReloadOnRevoke": {
+          "type": "boolean",
+          "description": "Ob beim Widerruf ein Reload nötig ist, um bereits geladene Ressourcen zu entfernen."
+        },
+        "notes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Freitext-Hinweise (z. B. Auditnotizen, Sonderfälle)."
+        }
+      }
+    }
+  }
+}

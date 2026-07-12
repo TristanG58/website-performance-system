@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/TristanG58/website-performance-system/shared/schemas/consent-state.schema.json",
+  "title": "WPS Consent State",
+  "description": "Serialisierbarer Consent-Zustand einer Website-Besucher-Entscheidung. Gemeinsamer Vertrag für Level 1, 2 und 3. Speicherort und Loader sind stack-spezifisch und NICHT Teil dieses Schemas.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "timestamp", "expiresAt", "categories", "method"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Version der Consent-Konfiguration (z. B. '2026-07-1' oder Semver). Freitext; das Schema interpretiert den Wert nicht. Änderungen lösen in der Programmlogik einen Reconsent aus."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Zeitpunkt der Entscheidung (ISO 8601 date-time)."
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Ablaufzeitpunkt der Entscheidung (ISO 8601 date-time). Die Prüfung, dass expiresAt nach timestamp liegt, erfolgt in der Programmlogik, nicht im Schema."
+    },
+    "categories": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["necessary", "analytics", "marketing", "externalMedia"],
+      "description": "Zustimmungsstatus je Kategorie. Keine unbekannten Kategorien erlaubt.",
+      "properties": {
+        "necessary": {
+          "const": true,
+          "description": "Funktional notwendige first-party Speicherungen. Immer aktiv, nicht abwählbar."
+        },
+        "analytics": {
+          "type": "boolean",
+          "description": "Reichweitenmessung. Standardmäßig false."
+        },
+        "marketing": {
+          "type": "boolean",
+          "description": "Werbe-, Remarketing- und Profiling-Dienste. Standardmäßig false."
+        },
+        "externalMedia": {
+          "type": "boolean",
+          "description": "Karten, Videos, Social Embeds und vergleichbare Drittinhalte. Standardmäßig false."
+        }
+      }
+    },
+    "method": {
+      "type": "string",
+      "enum": ["banner-accept-all", "banner-necessary", "settings", "reconsent"],
+      "description": "Wie die Entscheidung zustande kam."
+    }
+  }
+}
