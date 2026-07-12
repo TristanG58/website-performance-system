@@ -42,6 +42,7 @@ const SITE = {
   business: {
     name: "Musterwerk Bedachungen",
     legalName: "Musterwerk Bedachungen GmbH",
+    shortName: "Musterwerk",
     logo: "/assets/placeholders/company-logo.svg",
     tagline: "Ihr Meisterbetrieb für Dach und Fassade in Musterstadt und Umgebung.",
     footerBlurb: "Ihr Meisterbetrieb für Dach und Fassade in Musterstadt und Umgebung. Persönlich, zuverlässig und termintreu, von der ersten Beratung bis zur Übergabe.",

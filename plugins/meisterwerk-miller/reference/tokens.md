@@ -25,6 +25,7 @@ Bilanz: **76 unterschiedliche Skalar-Tokens · 25 REPEAT-Blöcke (11 Arrays, tei
 | Token | Beschreibung | Beispielwert (Demo) |
 |---|---|---|
 | `{{business.name}}` | Firmenname (Logo-alt, aria-label, Bild-alts) | `Musterwerk Bedachungen` |
+| `{{business.shortName}}` | Kurzer Markenname für „Warum …"-Eyebrows (Leistungen/Karriere) | `Musterwerk` (real: `Miller`) |
 | `{{business.logo}}` | Logo-Bild-URL (Header + Footer) | `/assets/placeholders/photo-roofing.svg` |
 | `{{business.footerBlurb}}` | Footer-Beschreibungsabsatz | `Ihr Meisterbetrieb für Dach und Fassade im Musterstadt und Umgebung. …` |
 | `{{business.phone}}` | Telefon (Anzeige) | `+49 123 4567890` |
