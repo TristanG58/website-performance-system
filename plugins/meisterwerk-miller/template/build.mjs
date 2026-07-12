@@ -51,11 +51,12 @@ if (consent.enabled === false) {
       'id="wps-consent-config"': count(html, 'id="wps-consent-config"'),
       "/consent/consent.css": count(html, '/consent/consent.css'),
       "/consent/consent.js": count(html, '/consent/consent.js'),
-      "data-consent-settings": count(html, "data-consent-settings"),
     };
     for (const [k, n] of Object.entries(checks)) {
       if (n !== 1) problems.push(`${rel}: '${k}' erwartet 1×, gefunden ${n}×`);
     }
+    // Footer-Trigger + optionale Medien-Platzhalter-Buttons nutzen data-consent-settings → mind. 1×
+    if (count(html, "data-consent-settings") < 1) problems.push(`${rel}: 'data-consent-settings' fehlt (>=1 erwartet)`);
   }
   // 3) Output-Artefakte vorhanden (render-all hat consent/ kopiert)?
   for (const f of ["consent/consent.js", "consent/consent.css"]) {
@@ -112,3 +113,53 @@ if (sh.length) {
   process.exit(1);
 }
 console.log("  ✓ Self-Host vollstaendig (Fonts + GSAP lokal, keine externen Hosts, 5 Seiten + styles.css).");
+
+/* ==========================================================================
+ *  Maps-Consent-Gating-Validierung (Level 2): kein Auto-iframe, Platzhalter,
+ *  Service in Registry (externalMedia), erlaubte Embed-Hosts.
+ * ========================================================================== */
+const MAPS_PAGES = ["index.html", "kontakt/index.html"];
+const ALLOWED_MAP_HOSTS = ["www.google.com", "maps.google.com"];
+const LIVE_MAPS_SRC = /(?<!data-consent-)src="https:\/\/(?:www|maps)\.google\.com\/[^"]*maps/i;
+const mv = [];
+
+// 1) Service-Registry-Eintrag google-maps (externalMedia)
+const svc = (consent && Array.isArray(consent.services) ? consent.services : []).find((s) => s && s.id === "google-maps");
+if (!svc) mv.push("config: Service 'google-maps' fehlt in consent.services");
+else if (svc.category !== "externalMedia") mv.push(`config: google-maps category='${svc.category}' (erwartet externalMedia)`);
+
+// 2) maps.embedUrl vorhanden + nur erlaubte Hosts + https
+const maps = SITE.maps;
+if (!maps || !maps.embedUrl) mv.push("config: SITE.maps.embedUrl fehlt");
+else {
+  try {
+    const u = new URL(maps.embedUrl);
+    if (u.protocol !== "https:" || !ALLOWED_MAP_HOSTS.includes(u.host)) mv.push(`config: maps.embedUrl Host/Protokoll unzulaessig (${u.protocol}//${u.host})`);
+  } catch (e) { mv.push("config: maps.embedUrl ist keine gueltige URL"); }
+}
+
+// 3) Maps-Seiten (Source + Output): kein <iframe, kein Live-Google-src, genau 1 Platzhalter
+for (const rel of MAPS_PAGES) {
+  for (const [label, base] of [["src", HERE], ["out", OUT]]) {
+    const p = join(base, rel);
+    if (!existsSync(p)) { mv.push(`fehlt: ${rel} (${label})`); continue; }
+    const html = readFileSync(p, "utf8");
+    if (html.includes("<iframe")) mv.push(`${rel} (${label}): initialer <iframe vorhanden`);
+    if (LIVE_MAPS_SRC.test(html)) mv.push(`${rel} (${label}): live Google-Maps-src (nicht data-consent-src)`);
+    if (count(html, "data-consent-service=") !== 1) mv.push(`${rel} (${label}): Platzhalter data-consent-service != 1`);
+  }
+}
+
+// 4) Nicht-Maps-Seiten (Output): kein Platzhalter, kein iframe
+for (const rel of PAGES.filter((p) => !MAPS_PAGES.includes(p))) {
+  const html = readFileSync(join(OUT, rel), "utf8");
+  if (html.includes("data-consent-service")) mv.push(`${rel}: unerwarteter Maps-Platzhalter`);
+  if (html.includes("<iframe")) mv.push(`${rel}: unerwarteter <iframe`);
+}
+
+if (mv.length) {
+  console.error("\n  ✗ Maps-Consent-Gating fehlgeschlagen:");
+  for (const m of mv) console.error("     - " + m);
+  process.exit(1);
+}
+console.log("  ✓ Maps-Consent-Gating (kein Auto-iframe, Platzhalter auf 2 Seiten, google-maps/externalMedia, erlaubte Hosts).");

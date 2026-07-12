@@ -280,7 +280,20 @@ const SITE = {
       marketing:     { enabled: true,  required: false },
       externalMedia: { enabled: true,  required: false },
     },
-    services: [],
+    services: [
+      {
+        id: "google-maps",
+        name: "Google Maps",
+        category: "externalMedia",
+        provider: "Google Ireland Limited",
+        privacyUrl: "https://policies.google.com/privacy",
+        storageWritten: [],
+        origins: ["https://www.google.com", "https://maps.google.com"],
+        enabled: true,
+        requiresReloadOnRevoke: false,
+        notes: ["Die Karte wird erst nach Zustimmung zu externen Medien geladen."],
+      },
+    ],
     texts: {
       bannerTitle: "Datenschutz-Einstellungen",
       bannerBody: "Diese Demo-Website nutzt nur technisch notwendige Speicherungen. Optionale Kategorien für Analyse, Marketing und externe Medien bleiben deaktiviert, bis Sie zustimmen.",
@@ -299,6 +312,18 @@ const SITE = {
         externalMedia: { title: "Externe Medien", body: "Erlaubt eingebettete Inhalte wie Karten oder Videos." },
       },
     },
+  },
+
+  /* ---- Maps (consent-gated, externalMedia). embedUrl = reine Daten, KEIN Code;
+     wird erst nach Zustimmung als iframe-src gesetzt. Musteradresse (kein PII). ---- */
+  maps: {
+    enabled: true,
+    serviceId: "google-maps",
+    embedUrl: "https://www.google.com/maps?q=Musterstra%C3%9Fe%2012,%2012345%20Musterstadt&output=embed",
+    title: "Kartenansicht – Musterstadt",
+    placeholderTitle: "Google Maps ist deaktiviert",
+    placeholderText: "Aktivieren Sie externe Medien, um die interaktive Karte zu laden.",
+    settingsLabel: "Cookie-Einstellungen öffnen",
   },
 };
 

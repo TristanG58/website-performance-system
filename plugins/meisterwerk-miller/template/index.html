@@ -363,7 +363,13 @@
           </div>
         </div>
         <div class="kt-map">
-          <iframe title="{{business.mapTitle}}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="{{business.mapEmbed}}"></iframe>
+          <div class="wps-consent-media" data-consent-service="{{maps.serviceId}}" data-consent-src="{{maps.embedUrl}}" data-consent-title="{{maps.title}}">
+            <div class="wps-consent-media-placeholder">
+              <strong class="wps-consent-media-title">{{maps.placeholderTitle}}</strong>
+              <p class="wps-consent-media-text">{{maps.placeholderText}}</p>
+              <button type="button" class="wps-consent-button wps-consent-button--primary" data-consent-settings>{{maps.settingsLabel}}</button>
+            </div>
+          </div>
         </div>
       </div>
 

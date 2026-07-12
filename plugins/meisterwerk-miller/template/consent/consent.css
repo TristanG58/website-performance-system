@@ -223,9 +223,67 @@
   .wps-consent-modal { border-radius: var(--wps-radius); }
 }
 
+/* ---- Consent-Medien (Maps-Platzhalter + geladenes iframe) --------------- */
+.wps-consent-media {
+  --wps-dark: var(--dark, #1c3f60);
+  --wps-light: var(--light, #f5f8fb);
+  --wps-key: var(--key1, #6a93b0);
+  --wps-ink: #10233a;
+  --wps-radius: var(--radius, 8px);
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 190px;
+  display: flex;
+  font-family: var(--bodyFont, "Albert Sans"), system-ui, sans-serif;
+}
+.wps-consent-media * { box-sizing: border-box; }
+
+/* Platzhalter (Default-Zustand, kein externer Request) */
+.wps-consent-media-placeholder {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  text-align: center;
+  padding: 1.25rem;
+  background:
+    repeating-linear-gradient(45deg, rgba(28, 63, 96, 0.05) 0 12px, rgba(28, 63, 96, 0.09) 12px 24px);
+  color: var(--wps-ink);
+}
+.wps-consent-media-placeholder[hidden] { display: none; }
+.wps-consent-media-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--wps-dark);
+}
+.wps-consent-media-text {
+  margin: 0;
+  max-width: 40ch;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Geladenes iframe (nach Consent). .kt-map iframe stylt Groesse/Filter zusaetzlich. */
+.wps-consent-media-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* Fehler-/Ladehinweis (optional per Klasse gesetzt) */
+.wps-consent-media--error .wps-consent-media-placeholder { outline: 2px solid var(--wps-key); }
+
 /* ---- Reduced Motion: keine Uebergaenge ---------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   .wps-consent-banner,
   .wps-consent-modal,
-  .wps-consent-button { transition: none !important; }
+  .wps-consent-button,
+  .wps-consent-media { transition: none !important; }
 }

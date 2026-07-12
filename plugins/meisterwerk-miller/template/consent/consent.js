@@ -58,13 +58,53 @@ const DEFAULT_CONFIG = {
   },
 };
 
+/* ---- URL-Allowlist fuer eingebettete Medien ------------------------------
+ *  Nur https + fest verdrahtete Hosts. Keine Ausfuehrung, nur iframe-src. */
+const MAP_HOST_ALLOWLIST = ["www.google.com", "maps.google.com"];
+function isAllowedMapUrl(url) {
+  try {
+    const u = new URL(String(url));
+    return u.protocol === "https:" && MAP_HOST_ALLOWLIST.includes(u.host);
+  } catch (e) {
+    return false;
+  }
+}
+
 /* ---- Statische Service-Registry-Schnittstelle ---------------------------
- *  Loader werden HIER statisch registriert (Service-ID -> Funktion). Da die
- *  Registry in dieser Phase leer ist (config.services === []), wird nichts
- *  geladen. Unbekannte IDs werden ignoriert und protokolliert.
- *  KEINE dynamische Codeausfuehrung, kein eval, keine Config-Funktionen. */
+ *  Loader werden HIER statisch per Service-ID registriert. Ausgewaehlt wird
+ *  ausschliesslich ueber die bekannte ID aus [data-consent-service]. Erzeugt
+ *  nur das erwartete iframe-Markup; KEIN eval, KEIN new Function, KEINE
+ *  dynamische Codeausfuehrung, KEINE Script-URLs aus beliebiger Config. */
 const serviceLoaders = {
-  // Beispiel (bewusst NICHT aktiv): "youtube-embed": (svc) => { ... }
+  "google-maps": {
+    category: "externalMedia",
+    load(el) {
+      if (el.querySelector("iframe.wps-consent-media-frame")) return; // Mehrfachladung verhindern
+      const url = el.getAttribute("data-consent-src");
+      if (!isAllowedMapUrl(url)) {
+        console.warn("[wps-consent] Ungueltige/blockierte Maps-URL – Karte nicht geladen:", url);
+        return; // Platzhalter bleibt bestehen
+      }
+      const f = document.createElement("iframe");
+      f.className = "wps-consent-media-frame";
+      f.title = el.getAttribute("data-consent-title") || "Karte";
+      f.loading = "lazy";
+      f.referrerPolicy = "no-referrer-when-downgrade";
+      f.setAttribute("allowfullscreen", "");
+      f.src = url; // src ERST jetzt gesetzt -> Request erst nach Consent
+      const ph = el.querySelector(".wps-consent-media-placeholder");
+      if (ph) ph.hidden = true;
+      el.appendChild(f);
+      el.classList.add("wps-consent-media--loaded");
+    },
+    unload(el) {
+      const f = el.querySelector("iframe.wps-consent-media-frame");
+      if (f) f.remove();
+      const ph = el.querySelector(".wps-consent-media-placeholder");
+      if (ph) ph.hidden = false;
+      el.classList.remove("wps-consent-media--loaded");
+    },
+  },
 };
 
 /* ---- Modul-Zustand ------------------------------------------------------- */
@@ -210,7 +250,7 @@ function persist(categories, method) {
   storageWrite(JSON.stringify(state));
   needsReconsent = false;
   dispatchChange(state);
-  loadConsentedServices(state);
+  applyServiceConsent(state);
   return state;
 }
 
@@ -222,20 +262,27 @@ function dispatchChange(state) {
   }
 }
 
-/** Laedt nur bekannte, aktivierte Dienste mit zugestimmter Kategorie. */
-function loadConsentedServices(state) {
-  const services = Array.isArray(CONFIG.services) ? CONFIG.services : [];
-  for (const svc of services) {
-    if (!svc || typeof svc !== "object") continue;
-    if (svc.enabled !== true) continue;                       // deaktiviert -> nie laden
-    if (!state.categories[svc.category]) continue;            // Kategorie nicht zugestimmt
-    const loader = serviceLoaders[svc.id];
-    if (typeof loader === "function") {
-      try { loader(svc); } catch (e) { console.warn("[wps-consent] Loader-Fehler:", svc.id, e); }
-    } else {
-      console.warn("[wps-consent] Kein Loader fuer Service registriert:", svc.id);
+/** DOM-getrieben: findet alle Medien-Platzhalter [data-consent-service] und
+ *  laedt/entlaedt je nach zugestimmter Kategorie. Ausgeloest ueber jede
+ *  gueltige Entscheidung (persist) und bei Init mit gueltigem Consent — im
+ *  selben Moment wie das Event wps:consentchange. */
+function applyServiceConsent(state) {
+  const cats = (state && state.categories) || {};
+  const nodes = document.querySelectorAll("[data-consent-service]");
+  nodes.forEach((el) => {
+    const id = el.getAttribute("data-consent-service");
+    const loader = serviceLoaders[id];
+    if (!loader) {                                            // nur bekannte Service-IDs
+      console.warn("[wps-consent] Unbekannter Medien-Service ignoriert:", id);
+      return;
     }
-  }
+    try {
+      if (cats[loader.category] === true) loader.load(el);    // Kategorie zugestimmt -> laden
+      else loader.unload(el);                                 // sonst blockiert/entladen
+    } catch (e) {
+      console.warn("[wps-consent] Medien-Service-Fehler:", id, e);
+    }
+  });
 }
 
 /* ========================================================================= *
@@ -459,7 +506,7 @@ function initConsentManager(config) {
   if (stored.state && isValidState(stored.state) && !isExpired(stored.state) && isCurrentVersion(stored.state)) {
     // gueltiger, aktueller Consent -> Event + zugelassene Services laden, kein Banner
     dispatchChange(stored.state);
-    loadConsentedServices(stored.state);
+    applyServiceConsent(stored.state);
   } else {
     // fehlend / ungueltig / abgelaufen / andere Version -> optionale bleiben aus, Banner zeigen
     needsReconsent = !!(stored.state && stored.parsedOk && !isCurrentVersion(stored.state));
