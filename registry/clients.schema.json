@@ -40,6 +40,11 @@
           "description": "Referenz auf registry/templates.json (z. B. level-1, level-2).",
           "enum": ["level-1", "level-2", "level-3"]
         },
+        "trade": {
+          "type": ["string", "null"],
+          "description": "Gewerk des Betriebs. Muss zu einem Eintrag in shared/knowledge/trades/<trade>.md UND standard.json trades.* passen. Bestimmt die erwartete Schema-Unterklasse. null = nicht gesetzt.",
+          "enum": ["dachdecker", "elektriker", "fliesenleger", "galabau", "kfz", "maler", "shk", "tischler", null]
+        },
         "templateVersion": {
           "type": ["string", "null"],
           "description": "Template-Version, gegen die die Site gebaut wurde."
@@ -51,6 +56,11 @@
         "hosting": {
           "type": ["string", "null"],
           "description": "Hosting-Ziel (z. B. Vercel, Netlify) — nur Bezeichner, keine Secrets."
+        },
+        "liveUrl": {
+          "type": ["string", "null"],
+          "format": "uri",
+          "description": "Öffentliche Produktions-URL der Site (Basis für den SEO/GEO-Monitor). null = noch nicht live."
         },
         "cms": {
           "type": ["string", "null"],
@@ -74,6 +84,27 @@
           "type": ["string", "null"],
           "format": "date-time",
           "description": "Zeitpunkt des letzten Audits (ISO 8601) oder null."
+        },
+        "seoBaseline": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "description": "Provenance der SEO-Drift-Baseline für den kontinuierlichen Monitor (Modul 'seo-continuous'). null = noch keine Baseline erfasst.",
+          "properties": {
+            "capturedAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Zeitpunkt der Baseline-Erfassung (ISO 8601)."
+            },
+            "standardVersion": {
+              "type": "string",
+              "description": "standardVersion (standard.json), gegen die die Baseline erfasst wurde. Weicht sie von der aktuellen ab, signalisiert das ein mögliches Upgrade (Soll > Site)."
+            },
+            "source": {
+              "type": "string",
+              "enum": ["built-html", "live-site"],
+              "description": "Quelle der Baseline. 'built-html' = Soll-Zustand aus unserem Build (bevorzugt, §4)."
+            }
+          }
         },
         "lastMigration": {
           "type": ["string", "null"],

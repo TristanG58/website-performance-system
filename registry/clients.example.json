@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.1.0",
+  "_note": "BEISPIEL-/FIXTURE-Datei fuer den SEO/GEO-Monitor. KEINE echten Kundendaten. Die produktive clients.json entsteht separat (ggf. nur auf dem Server). Nur oeffentliche Test-URLs.",
+  "clients": [
+    {
+      "clientId": "beispiel-dachdecker",
+      "displayName": "Beispiel Dachdecker (Fixture)",
+      "repository": "kairos/beispiel-dachdecker",
+      "templateId": "level-2",
+      "trade": "dachdecker",
+      "liveUrl": "https://www.dachdecker-nrw.de/",
+      "enabledModules": ["seo-continuous"],
+      "updatePolicy": "critical-only",
+      "stagingAvailable": false,
+      "rollbackAvailable": false,
+      "seoBaseline": {
+        "capturedAt": "2026-07-13T10:10:44+00:00",
+        "standardVersion": "1.0.0",
+        "source": "built-html"
+      },
+      "lastAudit": null,
+      "status": "active"
+    },
+    {
+      "clientId": "beispiel-inaktiv",
+      "displayName": "Beispiel ohne Monitoring (Fixture)",
+      "repository": "kairos/beispiel-inaktiv",
+      "templateId": "level-1",
+      "trade": "elektriker",
+      "liveUrl": "https://example.com/",
+      "enabledModules": [],
+      "status": "active"
+    }
+  ]
+}

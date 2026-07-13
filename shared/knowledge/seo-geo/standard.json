@@ -1,0 +1,36 @@
+{
+  "standardVersion": "1.0.0",
+  "updatedAt": "2026-07-13",
+  "source": {
+    "playbook": "shared/knowledge/seo-geo/geo-seo-playbook.md",
+    "note": "Maschinenlesbarer Soll-Vertrag fuer den kontinuierlichen SEO/GEO-Monitor. Von der News-/Trend-Automation fortgeschrieben, vom Monitor gelesen. Bei jeder inhaltlichen Aenderung standardVersion nach SemVer bumpen. 'require' = Pflicht (Regression, Site < Soll). 'deprecated' = ueberholt (Trend/Upgrade, Soll aendert sich)."
+  },
+  "global": {
+    "require": [
+      { "id": "title-present", "check": "title_nonempty", "severity": "CRITICAL", "driftRule": "title_removed", "rationale": "Genau ein aussagekraeftiger Title je Seite." },
+      { "id": "meta-description-present", "check": "meta_description_nonempty", "severity": "WARNING", "driftRule": "meta_description_changed", "rationale": "Meta-Description je Seite gepflegt." },
+      { "id": "canonical-present", "check": "canonical_present", "severity": "CRITICAL", "driftRule": "canonical_removed", "rationale": "Canonical auf echte Domain, verhindert Duplicate-Content." },
+      { "id": "single-h1", "check": "exactly_one_h1", "severity": "WARNING", "driftRule": "h1_removed", "rationale": "Genau eine H1 je Seite." },
+      { "id": "indexable", "check": "no_noindex", "severity": "CRITICAL", "driftRule": "noindex_added", "rationale": "Kernseiten duerfen nicht versehentlich auf noindex stehen (klassischer Deploy-GAU)." },
+      { "id": "localbusiness-schema", "check": "schema_subclass_present", "severity": "CRITICAL", "driftRule": "schema_removed", "params": { "base": "LocalBusiness" }, "rationale": "LocalBusiness (+ Gewerke-Unterklasse) ist Pflicht auf jeder Handwerker-Site. Konkrete Unterklasse siehe trades.*.schemaTypes." },
+      { "id": "robots-allows-ai", "check": "robots_allows_bots", "severity": "WARNING", "driftRule": null, "coveredBy": "monitor", "params": { "bots": ["Googlebot", "Bingbot", "OAI-SearchBot", "PerplexityBot", "ChatGPT-User", "Perplexity-User", "ClaudeBot"] }, "rationale": "robots.txt muss Search-/Antwort-Bots erlauben; CDN/Firewall darf AI-Bots nicht heimlich blocken." },
+      { "id": "sitemap-present", "check": "sitemap_exists", "severity": "WARNING", "driftRule": null, "coveredBy": "monitor", "rationale": "Saubere XML-Sitemap mit echter Domain." },
+      { "id": "nap-consistent", "check": "nap_consistent", "severity": "WARNING", "driftRule": null, "coveredBy": "monitor", "rationale": "Name/Adresse/Telefon ueberall identisch (Footer jeder Seite)." }
+    ],
+    "deprecated": [
+      { "id": "faq-rich-result", "target": "FAQPage", "since": "2026-05-07", "action": "kein-ranking-signal-mehr", "keepMarkup": true, "severity": "INFO", "rationale": "FAQ-Rich-Results endgueltig abgeschaltet 07.05.2026. Schema-Typ FAQPage bleibt gueltig (Bing/Perplexity/RAG-Crawler parsen weiter). NICHT als AI-Booster verkaufen; die sichtbare Q&A-Formatierung traegt die Arbeit.", "source": "https://developers.google.com/search/blog/2023/08/howto-faq-changes" },
+      { "id": "howto-rich-result", "target": "HowTo", "since": "2023-09", "action": "kein-ranking-signal-mehr", "keepMarkup": true, "severity": "INFO", "rationale": "HowTo-Rich-Results auf Desktop seit Sep 2023 abgeschafft. Markup ohne Rich-Result-Nutzen." },
+      { "id": "llms-txt-as-lever", "target": "llms.txt", "action": "kein-sichtbarkeits-hebel", "severity": "INFO", "rationale": "Google und OpenAI werten llms.txt nachweislich nicht fuer Such-/Zitationszwecke. Prioritaet: robots.txt >> Sitemap >> (optional, niedrig) llms.txt. Nicht als AI-Boost verkaufen.", "source": "https://www.seroundtable.com/google-does-not-endorse-llms-txt-40789.html" }
+    ]
+  },
+  "trades": {
+    "dachdecker": { "schemaTypes": { "base": "LocalBusiness", "accepted": ["RoofingContractor"], "recommended": "RoofingContractor", "dedicated": true } },
+    "shk": { "schemaTypes": { "base": "LocalBusiness", "accepted": ["Plumber", "HVACBusiness"], "recommended": "Plumber", "dedicated": true, "note": "SHK umfasst Sanitaer (Plumber) und Heizung/Klima (HVACBusiness); beide schema.org-Unterklassen zulaessig." } },
+    "elektriker": { "schemaTypes": { "base": "LocalBusiness", "accepted": ["Electrician"], "recommended": "Electrician", "dedicated": true } },
+    "maler": { "schemaTypes": { "base": "LocalBusiness", "accepted": ["HousePainter"], "recommended": "HousePainter", "dedicated": true } },
+    "fliesenleger": { "schemaTypes": { "base": "LocalBusiness", "accepted": ["GeneralContractor", "HomeAndConstructionBusiness"], "recommended": "GeneralContractor", "dedicated": false, "note": "Kein dedizierter schema.org-Typ fuer Fliesenleger; GeneralContractor (unter HomeAndConstructionBusiness) als Fallback." } },
+    "galabau": { "schemaTypes": { "base": "LocalBusiness", "accepted": ["GeneralContractor", "HomeAndConstructionBusiness"], "recommended": "GeneralContractor", "dedicated": false, "note": "schema.org hat keinen Landscaper-Typ; GeneralContractor-Fallback." } },
+    "kfz": { "schemaTypes": { "base": "LocalBusiness", "accepted": ["AutoRepair"], "recommended": "AutoRepair", "dedicated": true, "note": "AutoRepair liegt unter AutomotiveBusiness, nicht LocalBusiness-HomeAndConstruction; als LocalBusiness-Unterklasse dennoch gueltig." } },
+    "tischler": { "schemaTypes": { "base": "LocalBusiness", "accepted": ["GeneralContractor", "HomeAndConstructionBusiness"], "recommended": "GeneralContractor", "dedicated": false, "note": "Kein dedizierter Typ fuer Tischler/Schreiner; GeneralContractor-Fallback." } }
+  }
+}

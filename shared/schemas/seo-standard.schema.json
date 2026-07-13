@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/TristanG58/website-performance-system/shared/schemas/seo-standard.schema.json",
+  "title": "SEO/GEO-Standard-Vertrag",
+  "description": "Versionierter, maschinenlesbarer Soll-Vertrag (standard.json). Schnittstelle zwischen der News-/Trend-Automation (schreibt) und dem SEO/GEO-Monitor (liest). Enthaelt KEINE Kundendaten, Secrets oder API-Keys.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["standardVersion", "updatedAt", "global", "trades"],
+  "properties": {
+    "standardVersion": {
+      "type": "string",
+      "description": "SemVer dieses Standards. Bei jeder inhaltlichen Aenderung bumpen.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "updatedAt": {
+      "type": "string",
+      "description": "Datum der letzten Aenderung (ISO 8601, Datum oder Datetime).",
+      "format": "date"
+    },
+    "source": {
+      "type": "object",
+      "description": "Herkunftsnachweis / Prosa-Begleitdokument.",
+      "additionalProperties": true,
+      "properties": {
+        "playbook": { "type": "string" },
+        "note": { "type": "string" }
+      }
+    },
+    "global": {
+      "type": "object",
+      "description": "Gewerke-unabhaengige Erwartungen.",
+      "additionalProperties": false,
+      "required": ["require", "deprecated"],
+      "properties": {
+        "require": {
+          "type": "array",
+          "description": "Pflicht-Elemente. Fehlen = Regression (Site < Soll).",
+          "items": { "$ref": "#/$defs/requireRule" }
+        },
+        "deprecated": {
+          "type": "array",
+          "description": "Ueberholte Praktiken. Vorhandensein/Verlass darauf = Upgrade-Hinweis (Soll aendert sich).",
+          "items": { "$ref": "#/$defs/deprecatedRule" }
+        }
+      }
+    },
+    "trades": {
+      "type": "object",
+      "description": "Pro Gewerk (kebab-case Key, muss zu shared/knowledge/trades/<key>.md passen).",
+      "propertyNames": { "pattern": "^[a-z0-9][a-z0-9-]*$" },
+      "additionalProperties": { "$ref": "#/$defs/trade" },
+      "minProperties": 1
+    }
+  },
+  "$defs": {
+    "severity": { "type": "string", "enum": ["CRITICAL", "WARNING", "INFO"] },
+    "requireRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "check", "severity"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "check": { "type": "string", "description": "Symbolischer Check-Name, den der Monitor implementiert." },
+        "severity": { "$ref": "#/$defs/severity" },
+        "driftRule": { "type": ["string", "null"], "description": "Korrespondierende drift_compare-Regel, oder null wenn Monitor-Ebene." },
+        "coveredBy": { "type": "string", "enum": ["drift", "monitor"], "description": "Wo der Check heute implementiert ist." },
+        "params": { "type": "object", "additionalProperties": true },
+        "rationale": { "type": "string" }
+      }
+    },
+    "deprecatedRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "target", "action", "severity"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "target": { "type": "string", "description": "Betroffenes Element/Feature (z. B. FAQPage, HowTo, llms.txt)." },
+        "since": { "type": "string", "description": "Seit wann ueberholt (ISO-Datum oder YYYY-MM)." },
+        "action": { "type": "string", "description": "Was das bedeutet (z. B. kein-ranking-signal-mehr)." },
+        "keepMarkup": { "type": "boolean", "description": "Ob vorhandenes Markup bleiben darf." },
+        "severity": { "$ref": "#/$defs/severity" },
+        "rationale": { "type": "string" },
+        "source": { "type": "string", "description": "Beleg-URL." }
+      }
+    },
+    "trade": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaTypes"],
+      "properties": {
+        "schemaTypes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["base", "accepted", "recommended", "dedicated"],
+          "properties": {
+            "base": { "type": "string", "description": "Basistyp, i. d. R. LocalBusiness." },
+            "accepted": {
+              "type": "array",
+              "description": "Zulaessige schema.org-Unterklassen fuer dieses Gewerk.",
+              "items": { "type": "string" },
+              "minItems": 1
+            },
+            "recommended": { "type": "string", "description": "Bevorzugte Unterklasse." },
+            "dedicated": { "type": "boolean", "description": "true = dedizierter schema.org-Typ existiert; false = Fallback." },
+            "note": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}
