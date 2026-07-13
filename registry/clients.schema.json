@@ -43,7 +43,7 @@
         "trade": {
           "type": ["string", "null"],
           "description": "Gewerk des Betriebs. Muss zu einem Eintrag in shared/knowledge/trades/<trade>.md UND standard.json trades.* passen. Bestimmt die erwartete Schema-Unterklasse. null = nicht gesetzt.",
-          "enum": ["dachdecker", "elektriker", "fliesenleger", "galabau", "kfz", "maler", "shk", "tischler", null]
+          "enum": ["dachdecker", "elektriker", "fliesenleger", "galabau", "kfz", "maler", "photovoltaik", "shk", "tischler", null]
         },
         "templateVersion": {
           "type": ["string", "null"],

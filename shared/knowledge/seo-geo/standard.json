@@ -1,5 +1,5 @@
 {
-  "standardVersion": "1.0.0",
+  "standardVersion": "1.1.0",
   "updatedAt": "2026-07-13",
   "source": {
     "playbook": "shared/knowledge/seo-geo/geo-seo-playbook.md",
@@ -27,6 +27,7 @@
     "dachdecker": { "schemaTypes": { "base": "LocalBusiness", "accepted": ["RoofingContractor"], "recommended": "RoofingContractor", "dedicated": true } },
     "shk": { "schemaTypes": { "base": "LocalBusiness", "accepted": ["Plumber", "HVACBusiness"], "recommended": "Plumber", "dedicated": true, "note": "SHK umfasst Sanitaer (Plumber) und Heizung/Klima (HVACBusiness); beide schema.org-Unterklassen zulaessig." } },
     "elektriker": { "schemaTypes": { "base": "LocalBusiness", "accepted": ["Electrician"], "recommended": "Electrician", "dedicated": true } },
+    "photovoltaik": { "schemaTypes": { "base": "LocalBusiness", "accepted": ["Electrician", "HomeAndConstructionBusiness"], "recommended": "Electrician", "dedicated": false, "note": "Kein dedizierter schema.org-Typ fuer PV/Solar. Electrician (Elektro-Meisterbetrieb, empfohlen) oder HomeAndConstructionBusiness-Fallback fuer reine Solar-Installateure." } },
     "maler": { "schemaTypes": { "base": "LocalBusiness", "accepted": ["HousePainter"], "recommended": "HousePainter", "dedicated": true } },
     "fliesenleger": { "schemaTypes": { "base": "LocalBusiness", "accepted": ["GeneralContractor", "HomeAndConstructionBusiness"], "recommended": "GeneralContractor", "dedicated": false, "note": "Kein dedizierter schema.org-Typ fuer Fliesenleger; GeneralContractor (unter HomeAndConstructionBusiness) als Fallback." } },
     "galabau": { "schemaTypes": { "base": "LocalBusiness", "accepted": ["GeneralContractor", "HomeAndConstructionBusiness"], "recommended": "GeneralContractor", "dedicated": false, "note": "schema.org hat keinen Landscaper-Typ; GeneralContractor-Fallback." } },

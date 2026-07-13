@@ -113,8 +113,10 @@ Zwei komplementäre Drift-Richtungen, **eine gemeinsame Standard-Quelle**:
       alle driftRule-Referenzen gültig. **Dies ist die Andock-Schnittstelle für die News-/Trend-Automation.**
 - [x] **S5 — Report-Template:** ✅ In `evaluate.py --format md` — Findings severity-sortiert (CRITICAL oben), Kopf mit Summary,
       `notEvaluated`-Hinweis. JSON bleibt der Dashboard-Vertrag (`seo-report.schema.json`).
-- [ ] **S6 — Pilot:** 1 echte KAIROS-Kundenseite beaufsichtigt durchlaufen (Baseline → Änderung → Compare → Report),
-      bevor irgendein unbeaufsichtigter Scheduler scharf geschaltet wird.
+- [x] **S6 — Pilot:** ✅ Gegen echte KAIROS-Site `pv-fachbetrieb.vercel.app` (Böttger Elektro/PV, Rodenberg) beaufsichtigt gefahren.
+      Ergebnis ideal: 0 CRITICAL / 0 WARNING / 1 INFO (FAQPage deprecated). Zwei-Lauf-Lebenszyklus (baseline_established → compared) live bestätigt.
+      **Pilot-Erkenntnis umgesetzt:** Gewerk `photovoltaik` zu standard.json ergänzt (accepted: Electrician + HomeAndConstructionBusiness),
+      `standardVersion` 1.0.0 → 1.1.0. Re-Pilot bestätigte: Schema-Check grün + Upgrade-Finding (1.0.0→1.1.0) feuert — voller Kreislauf live bewiesen.
 - [ ] **S7 — Learning:** Session-Learning nach `Kairos-Websites/learnings/` (Python-Version-Falle, Deps, Regelset).
 
 ## 6. Nicht-Ziele / Do-Not
