@@ -163,3 +163,60 @@ if (mv.length) {
   process.exit(1);
 }
 console.log("  ✓ Maps-Consent-Gating (kein Auto-iframe, Platzhalter auf 2 Seiten, google-maps/externalMedia, erlaubte Hosts).");
+
+/* ==========================================================================
+ *  Registry-Autoritaet (Level 2): config.consent.services ist die EINZIGE
+ *  Wahrheit; der Browser (#wps-consent-config) muss exakt dieselbe Registry
+ *  erhalten. Struktur-Fail-closed-Check ohne neue Schema-Dependency.
+ * ========================================================================== */
+const rg = [];
+const KNOWN_CATS = ["necessary", "analytics", "marketing", "externalMedia"];
+const registrySrc = Array.isArray(consent.services) ? consent.services : [];
+const canonicalRegistry = JSON.stringify(registrySrc);
+
+// A) Fail-closed Strukturpruefung der Config-Registry
+function hasFunctionDeep(v) {
+  if (typeof v === "function") return true;
+  if (Array.isArray(v)) return v.some(hasFunctionDeep);
+  if (v && typeof v === "object") return Object.values(v).some(hasFunctionDeep);
+  return false;
+}
+const seenIds = new Set();
+for (const s of registrySrc) {
+  if (!s || typeof s !== "object") { rg.push("registry: Eintrag ist kein Objekt"); continue; }
+  if (typeof s.id !== "string" || !s.id) rg.push(`registry: ungueltige/leere id (${JSON.stringify(s.id)})`);
+  else { if (seenIds.has(s.id)) rg.push(`registry: doppelte id '${s.id}'`); seenIds.add(s.id); }
+  if (!KNOWN_CATS.includes(s.category)) rg.push(`registry: '${s.id}': unbekannte category '${s.category}'`);
+  if (typeof s.enabled !== "boolean") rg.push(`registry: '${s.id}': enabled nicht boolean`);
+  for (const f of ["storageWritten", "origins", "notes"]) if (!Array.isArray(s[f])) rg.push(`registry: '${s.id}': ${f} ist kein Array`);
+  if (hasFunctionDeep(s)) rg.push(`registry: '${s.id}': enthaelt eine Funktion`);
+}
+
+// B) google-maps genau 1×, externalMedia, enabled
+const gm = registrySrc.filter((s) => s && s.id === "google-maps");
+if (gm.length !== 1) rg.push(`registry: google-maps ${gm.length}× (erwartet 1)`);
+else {
+  if (gm[0].category !== "externalMedia") rg.push(`registry: google-maps category='${gm[0].category}'`);
+  if (gm[0].enabled !== true) rg.push(`registry: google-maps enabled=${gm[0].enabled}`);
+}
+
+// C) Jede gerenderte Seite: genau 1 Config-Block, gueltiges JSON, services == Registry, keine offenen Tokens
+const CFG_RE = /<script type="application\/json" id="wps-consent-config">\s*([\s\S]*?)\s*<\/script>/g;
+for (const rel of PAGES) {
+  const html = readFileSync(join(OUT, rel), "utf8");
+  const blocks = [...html.matchAll(CFG_RE)];
+  if (blocks.length !== 1) { rg.push(`${rel}: #wps-consent-config ${blocks.length}× (erwartet 1)`); continue; }
+  let parsed;
+  try { parsed = JSON.parse(blocks[0][1]); } catch (e) { rg.push(`${rel}: Config-JSON ungueltig (${e.message})`); continue; }
+  if (!Array.isArray(parsed.services)) rg.push(`${rel}: services ist kein Array`);
+  else if (JSON.stringify(parsed.services) !== canonicalRegistry) rg.push(`${rel}: Browser-Registry != SITE.consent.services`);
+  if (registrySrc.length > 0 && /"services"\s*:\s*\[\]/.test(html)) rg.push(`${rel}: Literal "services":[] trotz nicht-leerer Registry`);
+  if (/\{\{/.test(html)) rg.push(`${rel}: offene Template-Tokens ({{…}}) im Output`);
+}
+
+if (rg.length) {
+  console.error("\n  ✗ Registry-Autoritaet fehlgeschlagen:");
+  for (const m of rg) console.error("     - " + m);
+  process.exit(1);
+}
+console.log("  ✓ Registry autoritativ (config.consent.services == Browser-JSON auf 5 Seiten, google-maps/externalMedia/enabled, keine offenen Tokens).");

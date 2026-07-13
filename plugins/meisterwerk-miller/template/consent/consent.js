@@ -77,7 +77,6 @@ function isAllowedMapUrl(url) {
  *  dynamische Codeausfuehrung, KEINE Script-URLs aus beliebiger Config. */
 const serviceLoaders = {
   "google-maps": {
-    category: "externalMedia",
     load(el) {
       if (el.querySelector("iframe.wps-consent-media-frame")) return; // Mehrfachladung verhindern
       const url = el.getAttribute("data-consent-src");
@@ -262,23 +261,43 @@ function dispatchChange(state) {
   }
 }
 
+/** Sucht einen Service in der (autoritativen) Registry CONFIG.services. */
+function findService(id) {
+  const reg = Array.isArray(CONFIG.services) ? CONFIG.services : [];
+  return reg.find((s) => s && s.id === id) || null;
+}
+
 /** DOM-getrieben: findet alle Medien-Platzhalter [data-consent-service] und
- *  laedt/entlaedt je nach zugestimmter Kategorie. Ausgeloest ueber jede
- *  gueltige Entscheidung (persist) und bei Init mit gueltigem Consent — im
- *  selben Moment wie das Event wps:consentchange. */
+ *  laedt/entlaedt strikt anhand der autoritativen Registry (CONFIG.services)
+ *  aus config/site.js. Kategorie + enabled kommen NUR aus der Registry; der
+ *  statische Loader liefert ausschliesslich die Lade-/Entlade-Mechanik.
+ *  Fail-closed: geladen wird nur, wenn Registry-Eintrag + Loader + bekannte,
+ *  zugestimmte Kategorie + enabled zusammentreffen. Ausgeloest bei jeder
+ *  gueltigen Entscheidung (persist) und bei Init mit gueltigem Consent. */
 function applyServiceConsent(state) {
   const cats = (state && state.categories) || {};
   const nodes = document.querySelectorAll("[data-consent-service]");
   nodes.forEach((el) => {
     const id = el.getAttribute("data-consent-service");
-    const loader = serviceLoaders[id];
-    if (!loader) {                                            // nur bekannte Service-IDs
-      console.warn("[wps-consent] Unbekannter Medien-Service ignoriert:", id);
+    const loader = serviceLoaders[id];               // statische Mechanik, per ID
+    const svc = findService(id);                     // Metadaten aus der Registry
+    // bekannte Consent-Kategorie? (necessary/analytics/marketing/externalMedia)
+    const category = svc && svc.category;
+    const knownCat = !!category && Object.prototype.hasOwnProperty.call(cats, category);
+    const okToLoad =
+      !!loader &&                                    // statischer Loader existiert
+      !!svc &&                                       // Registry-Eintrag existiert
+      svc.enabled === true &&                        // in der Config aktiviert
+      knownCat &&                                    // Kategorie ist bekannt
+      cats[category] === true;                       // Kategorie zugestimmt
+    if (!loader) {
+      // ohne statischen Loader wird nichts erzeugt; unbekannte IDs nie ausgefuehrt
+      if (svc) console.warn("[wps-consent] Kein statischer Loader fuer Service:", id);
       return;
     }
     try {
-      if (cats[loader.category] === true) loader.load(el);    // Kategorie zugestimmt -> laden
-      else loader.unload(el);                                 // sonst blockiert/entladen
+      if (okToLoad) loader.load(el);
+      else loader.unload(el);                        // fail-closed: nicht laden / entladen
     } catch (e) {
       console.warn("[wps-consent] Medien-Service-Fehler:", id, e);
     }

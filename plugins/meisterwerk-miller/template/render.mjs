@@ -19,6 +19,9 @@
  *    {{business.name}}   absoluter Punkt-Pfad ins SITE-Objekt
  *    {{.title}}          Feld des aktuellen REPEAT-Items (relativer Pfad)
  *    {{.}}               das Item selbst (String-Arrays: bullets, gallery, …)
+ *    {{json consent.services}}  serialisiert den Wert als script-sicheres JSON
+ *                        (JSON.stringify + </ / -Escape; fehlt der
+ *                        Wert -> []). Fuer <script type="application/json">-Bloecke.
  *
  *    <!-- REPEAT services --> … {{.title}} … <!-- /REPEAT services -->
  *    <!-- REPEAT .bullets --><li>{{.}}</li><!-- /REPEAT .bullets -->   (nested)
@@ -134,6 +137,24 @@ function fillScalars(tpl, ctx, root) {
   });
 }
 
+/* ---- 2b) JSON-Token: {{json pfad}} -> script-sicheres JSON ----------------
+ *  Serialisiert einen aufgeloesten Wert (z. B. consent.services) via
+ *  JSON.stringify und escaped ihn fuer den <script>-Kontext (kein </script>-
+ *  Ausbruch, sichere U+2028/U+2029). Fehlender Wert -> [] (fail-safe gueltiges
+ *  JSON). MUSS VOR fillScalars laufen, sonst faengt die Skalar-Regel den Token
+ *  ab. Rein deklarativ: kein eval, kein new Function, keine Codeausfuehrung. */
+function jsonForScript(value) {
+  return JSON.stringify(value === undefined ? [] : value)
+    .replace(/</g, "\\u003c")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+}
+function fillJson(tpl, ctx, root) {
+  return tpl.replace(/\{\{\s*json\s+([^}]+?)\s*\}\}/g, (_, path) =>
+    jsonForScript(resolvePath(path, ctx, root))
+  );
+}
+
 /* ---- Haupt-Render -------------------------------------------------------- */
 export function render(tpl, data, root) {
   const r = root === undefined ? data : root;
@@ -146,6 +167,7 @@ export function render(tpl, data, root) {
   }
   let out = expandRepeats(tpl, data, r);
   out = evalIfs(out, data, r);
+  out = fillJson(out, data, r);       // {{json pfad}} VOR den Skalar-Tokens
   out = fillScalars(out, data, r);
   return out;
 }
