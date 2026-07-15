@@ -117,7 +117,8 @@ Zwei komplementäre Drift-Richtungen, **eine gemeinsame Standard-Quelle**:
       Ergebnis ideal: 0 CRITICAL / 0 WARNING / 1 INFO (FAQPage deprecated). Zwei-Lauf-Lebenszyklus (baseline_established → compared) live bestätigt.
       **Pilot-Erkenntnis umgesetzt:** Gewerk `photovoltaik` zu standard.json ergänzt (accepted: Electrician + HomeAndConstructionBusiness),
       `standardVersion` 1.0.0 → 1.1.0. Re-Pilot bestätigte: Schema-Check grün + Upgrade-Finding (1.0.0→1.1.0) feuert — voller Kreislauf live bewiesen.
-- [ ] **S7 — Learning:** Session-Learning nach `Kairos-Websites/learnings/` (Python-Version-Falle, Deps, Regelset).
+- [x] **S7 — Learning:** ✅ `Kairos-Websites/learnings/website-performance-system/2026-07-13_seo-geo-continuous-monitor.md`
+      (Python-3.10-Falle, Vendoring-Muster + 2 Patches, Skript-Closure, Schema-Unterklassen-Mapping, Cron-ohne-LLM, Fallen).
 
 ## 6. Nicht-Ziele / Do-Not
 
