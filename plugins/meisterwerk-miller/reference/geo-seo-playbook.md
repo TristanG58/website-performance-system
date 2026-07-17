@@ -1,5 +1,10 @@
 # GEO + Local SEO Playbook (Handwerk)
 
+> **Diese Datei ist die Quelle — die Kopien unter `plugins/*/reference/` nie direkt editieren.**
+> Sie werden per `shared/sync/sync-manifest.json` von hier gespiegelt (die Plugins müssen
+> eigenständig ausliefern können). Nach jeder Änderung: `node shared/sync/sync.mjs --sync`.
+> Prüfen ohne zu schreiben: `--check`. Details: `shared/sync/README.md`.
+
 > Praxis-Referenz für den Bau von Websites für deutsche Handwerksbetriebe, die **lokale Leads gewinnen** UND **von AI-Antwortmaschinen zitiert werden** (ChatGPT, Google AI Overviews/AI Mode, Perplexity, Gemini).
 > Stand: Juni 2026. Jede umstrittene Behauptung ist mit **Verifiziert:** oder **Umstritten:** markiert.
 
@@ -26,6 +31,43 @@ Googles Liste der relevanten Fundamentals (1:1 aus der Doku):
 **Konsequenz für den Bau:** Es gibt keinen "AI-Hack". Wer sauberes On-Page-SEO, echte E-E-A-T-Signale und einzigartigen Mehrwert (lokale Expertise, Referenzen, konkrete Preise/Fakten) liefert, ist automatisch GEO-optimiert. Alles, was als "Geheimtrick für ChatGPT-Ranking" verkauft wird, ist Marketing.
 
 **Quelle:** https://developers.google.com/search/docs/appearance/ai-features
+
+---
+
+## Ziel festlegen: Mention oder Citation
+
+Jede GEO-Maßnahme zielt auf genau eines von zwei Ergebnissen:
+
+- **Mention (Erwähnung):** Die Marke wird in der AI-Antwort **genannt** — z. B. als eine von drei Empfehlungen. Bei ChatGPT oft **ohne Link**: kein Klick, aber die Vorentscheidung. In Googles AI Mode werden Nennungen verlinkt.
+- **Citation (Zitierung):** Die eigene Seite wird als **Quelle mit klickbarem Link** angegeben. Passiert, wenn die AI eine konkrete Information von der Seite übernimmt. Bringt Traffic.
+
+**Für Handwerk ist das keine Entscheidung, sondern eine Konstante: fast immer Mention.** Niemand fragt eine AI nach einem Ratgeber über Dachziegel und beauftragt daraufhin einen Dachdecker. Gefragt wird „bester Dachdecker in [Ort]" — und entweder der Betrieb steht unter den drei genannten Namen, oder er existiert für diesen Menschen nicht.
+
+**Die unbequeme Konsequenz:** Mentions entstehen überwiegend **außerhalb der eigenen Website** — über Erwähnungen, Verzeichnisse, Bewertungen und Vergleichslisten. Das erklärt die Gewichtung im Local-SEO-Kapitel unten (GBP ~36 %, Bewertungen ~17 %, On-Page ~16 %): **Die perfekte Website ist Vorbedingung, nicht Ursache.** Ohne sie wird man nicht genannt — mit ihr allein aber auch nicht.
+
+Citation bleibt relevant für **Ratgeber-Inhalte auf der Seite** (Kosten, Förderung, Ablauf). Dort ist Traffic das Ziel, und dort kann die Seite die zitierte Quelle sein.
+
+**Einordnung:** Taxonomie (Definition, nicht empirisch). Die Handwerk-Konsequenz ist eine eigene Ableitung aus den Local-SEO-Gewichten weiter unten — keine Fremdbehauptung.
+
+---
+
+## Grounding: die Vorbedingung jeder Citation
+
+Ein LLM antwortet zunächst aus seinem **eingefrorenen Trainingswissen** — es sucht nicht von selbst. **Grounding** heißt: Das Modell erkennt, dass dieses Wissen nicht reicht, sucht live im Netz und baut die Antwort aus den gefundenen Seiten. Die Technik dahinter heißt **RAG** (Retrieval Augmented Generation).
+
+**Die Konsequenz, die alles steuert: ohne Grounding keine Citation.** Antwortet die AI aus dem Gedächtnis, nennt sie **keine Quelle** — dann ist die Seite chancenlos, egal wie gut sie ist. Erst die Live-Suche erzeugt überhaupt einen Quellen-Link.
+
+Das ergänzt das Grundprinzip oben um die **Frage-Seite**: „indexiert + snippet-fähig" ist die Bedingung auf *Seiten*-Ebene, Grounding die Bedingung auf *Query*-Ebene. Beide müssen erfüllt sein.
+
+**Welche Fragen lösen Grounding aus?**
+> ❌ **Kein Grounding:** „Was ist eine Photovoltaik-Anlage?" — weiß das Modell auswendig. Keine Quelle, keine Chance.
+> ✅ **Grounding:** „Was kostet eine PV-Anlage mit Speicher in Meschede 2026?" — zu frisch, zu lokal, zu konkret fürs Training. Das Modell *muss* suchen.
+
+**Regel für die Copy:** aktuell, konkret, lokal, mit Jahreszahl, mit Zahlen und Spannen. Also exakt das, was die Citable-Copy-Patterns unten ohnehin verlangen — Grounding erklärt, **warum** sie wirken.
+
+**Kein Freifahrtschein:** Das ist *kein* Auftrag, Jahreszahlen und Ortsnamen in den Text zu streuen. Das wäre Keyword-Stuffing — im GEO-Paper die schlechteste Methode, teils mit negativem Effekt (siehe unten). Die Frage muss echt sein und die Antwort belastbar.
+
+**Einordnung:** Mechanismus-Beschreibung, unstrittig (so arbeiten ChatGPT Search, Perplexity und AI Overviews). Bewusst ohne Zahlen.
 
 ---
 
@@ -109,6 +151,12 @@ Schreibregeln, die direkt aus dem GEO-Paper folgen. Jeder Abschnitt einer Handwe
 **6. Entity-Konsistenz**
 - Firmenname, Adresse, Telefonnummer, Leistungen **überall identisch** schreiben (Website, GBP, Verzeichnisse). LLMs bauen daraus eine konsistente "Entität" — Widersprüche kosten Vertrauen und Zitierfähigkeit.
 - Eigenen Markennamen + Ort + Leistung in einem Satz koppeln: "Elektro Muster, Ihr Elektromeister in Musterstadt-Mitte".
+
+**7. Unterfragen mitbeantworten (Query Fan-out)**
+Moderne AI-Systeme zerlegen eine Frage in mehrere Unterfragen und suchen zu jeder einzeln — Google nennt das für den AI Mode **Query Fan-out**. Aus „PV-Anlage mit Speicher fürs Einfamilienhaus in Meschede" werden im Hintergrund u. a.: *Kosten pro kWp 2026 · Speichergröße für 4 Personen · Förderung NRW · Amortisationsdauer · Ablauf Netzanschluss*.
+> Wer diese Unterfragen auf **einer** Seite beantwortet, wird deutlich wahrscheinlicher zur Quelle.
+
+**Im Build so einsetzen:** vor dem Texten die Unterfragen einsammeln (eine AI direkt fragen: *„Mach ein Query Fan-out zu [Thema] und zeig mir alle Unterfragen"*). Das Ergebnis ist die **Gliederung** der Seite und speist unmittelbar die Q&A-Blöcke aus Pattern 5.
 
 **Grundhaltung:** Inhalte sollen aussehen wie **belastbare Evidenz**, die ein LLM 1:1 als Antwortbaustein übernehmen kann — faktisch, strukturiert, verifizierbar. Keine Marketing-Floskeln.
 
@@ -376,5 +424,11 @@ E-E-A-T (Experience, Expertise, Authoritativeness, Trust) ist das, was Google un
 - Local SEO Rankingfaktoren 2026 (dt., Whitespark-basiert): https://www.local-seo-agentur.de/local-seo-rankingfaktoren
 - awesome-generative-engine-optimization (kuratierte Tool-/Guide-Liste): https://github.com/amplifying-ai/awesome-generative-engine-optimization
 - krillinai/GEO (praktisches Playbook): https://github.com/krillinai/GEO
-</content>
-</invoke>
+
+---
+
+## Herkunft der Konzepte „Mention/Citation", „Grounding", „Query Fan-out" (ergänzt 2026-07-17)
+
+Diese drei Konzepte kamen über einen externen GEO-Kurs herein (*„In ChatGPT und Co. gefunden werden"*, Module 1–3). **Der Kurs belegt keine einzige seiner Zahlen** — u. a. „44 % der ChatGPT-Empfehlungen stammen aus Top-Listen", „bis zu −60 % Klicks bei AI-Antworten", „−2,5 % organischer Traffic gesamt", ChatGPT-Marktanteil „Richtung 50 %".
+
+Übernommen wurden deshalb **ausschließlich Mechanismus und Terminologie — keine dieser Zahlen.** Wer eine davon verwenden will, muss sie vorher selbst belegen. Offene Punkte dazu: `tasks/backlog.md`.

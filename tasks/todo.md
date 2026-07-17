@@ -132,3 +132,55 @@ Zwei komplementäre Drift-Richtungen, **eine gemeinsame Standard-Quelle**:
 ## Review (wird nach Umsetzung gefüllt)
 
 _(Zusammenfassung der Änderungen — noch leer.)_
+
+---
+
+# S8 (2026-07-17): GEO-Kurs-Ertrag einarbeiten + Backlog verankern
+
+**Auslöser:** Analyse von `~/Downloads/GEO-Kurs - In ChatGPT und Co. gefunden werden.md`.
+**Befund:** Kurs enthält nur Modul 1–3 von 8 (Modul 4–8 = Content/E-E-A-T/Technik/Messen/Verkauf fehlen)
+und belegt **keine einzige** seiner Zahlen. Echter Ertrag: 3 Konzepte fürs Playbook. Sonst nichts.
+
+**Leitregel dieses Schritts (User, 2026-07-17):** nur einbauen, was **ohne weitere Komplikationen**
+einfügbar ist. Alles andere wird so vermerkt, dass es in **jedem neuen Chat** gefunden wird.
+
+## Tun (komplikationsfrei, keine Code-Änderung)
+
+- [x] **Playbook ×3 Kopien** (byte-identisch halten: `shared/knowledge/seo-geo/`,
+      `plugins/meisterwerk/reference/`, `plugins/meisterwerk-miller/reference/`)
+  - [x] Neue Section **„Ziel festlegen: Mention oder Citation"** nach Grundprinzip
+        → für Handwerk keine Entscheidung, sondern Konstante: **immer Mention**.
+        Erklärt, warum GBP (~36 %) + Bewertungen (~17 %) die On-Page-Arbeit (~16 %) schlagen.
+  - [x] Neue Section **„Grounding: die Vorbedingung jeder Citation"**
+        → ohne Live-Suche kein Quellen-Link. Ergänzt „indexiert + snippet-fähig" um die *Query-Seite*.
+  - [x] Citable-Copy-Pattern **„7. Unterfragen mitbeantworten (Query Fan-out)"**
+  - [x] Provenienz-Hinweis: Konzepte aus dem Kurs, **Zahlen des Kurses bewusst NICHT übernommen**
+        (unbelegt). Nur Mechanismus/Framing, keine Statistik → Quellendisziplin bleibt intakt.
+- [x] **Playbook-Tail säubern:** verirrte `</content>` / `</invoke>` am Dateiende (alle 3 Kopien)
+- [x] **`tasks/backlog.md`** anlegen — die vertagten Punkte samt Begründung
+- [x] **Memory + `MEMORY.md`-Index** → Auffindbarkeit bei „was sind die nächsten Schritte?"
+
+## Nicht tun (→ `tasks/backlog.md`)
+
+- **`standard.json`: keine neue Regel, kein Versionsbump.** Zwei Gründe: (1) Kursinhalt ist
+  Strategie, nicht maschinell prüfbar; (2) unbelegt — der Vertrag hat genau *einen* Schreiber
+  (News-Automation, mit Quellenpflicht). Beides würde den Vertrag beschädigen.
+- **AI-Visibility-Automation (Kurs-Schritt 1+7).** Größte Chance, aber vorher zu klären:
+  API vs. Produkt (OpenAI-API groundet ≠ chatgpt.com), Nicht-Determinismus, Kosten,
+  **Secret-Management existiert noch nicht**. → eigenes Vorhaben.
+- **Erwähnungen / Top-Listen (Kurs-Schritt 6)** — ruht, bis die 44-%-Behauptung belegt ist.
+- ~~**Playbook-Dedup** (3 Kopien → 1 Quelle) — Refactor, nicht Teil dieses Schritts.~~
+  **Korrektur (2026-07-17): hinfällig.** `shared/sync/` („Modell C") löst das längst — zentrale Quelle
+  → gespiegelte Kopien, Manifest + `--check`. Die Kopien sind Absicht (Plugins sind eigenständig
+  auslieferbar). Ich hatte das als Problem geführt, weil der Mechanismus in **keiner** .md
+  dokumentiert war. Behoben statt refactored: `shared/sync/README.md` + Playbook-Header.
+- **`evaluate.py` / `run.py` / Monitor: unangetastet.**
+
+## Nachtrag: Aufräumen vor dem Commit (2026-07-17)
+
+- [x] `shared/sync/README.md` — der Mechanismus ist jetzt auffindbar (war nur Kopfkommentar in `sync.mjs`)
+- [x] Playbook-Header: „Diese Datei ist die Quelle — Plugin-Kopien nie direkt editieren"
+- [x] Kopien per `node shared/sync/sync.mjs --sync` gezogen (nicht mehr per Hand-`cp`)
+- [x] `tasks/backlog.md` B5 als Irrtum korrigiert statt still gelöscht — inkl. Grund, damit der
+      nächste Agent nicht denselben Refactor erneut vorschlägt
+- [x] Verifiziert: `sync.mjs --check` → 13 Entries, 26 Targets, 0 Errors, Exit 0
