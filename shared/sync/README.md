@@ -31,6 +31,26 @@ node shared/sync/sync.mjs --sync    # Quellen → Ziele kopieren (idempotent)
 
 Neue geteilte Datei? Eintrag in `sync-manifest.json` ergänzen (`id`, `source`, `targets`, `mode: "copy"`).
 
+## Pre-commit-Hook (empfohlen, einmalig pro Klon)
+
+Schritt 3 automatisch erzwingen — `.githooks/pre-commit` bricht den Commit ab, wenn Kopien abweichen:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Der Hook liegt **im Repo** (versioniert), aber `core.hooksPath` ist Klon-lokale Config — **jeder neue
+Klon braucht diesen einen Befehl**, sonst ist der Hook inaktiv. Bypass im Notfall: `git commit --no-verify`.
+
+**Was er nicht abdeckt (ehrlich):**
+- Er prüft den **Working Tree**, nicht den Index. Wer synchronisiert, aber nur die Quelle staged
+  (`git add shared/...` ohne die Kopien), committet trotzdem einen driftenden Stand — der Hook sieht
+  einen sauberen Working Tree und lässt durch. Deshalb im Fix-Hinweis `git add -u`.
+- Ohne `node` im PATH warnt er und lässt durch, statt jeden Commit zu blockieren.
+
+Beide Lücken schließt erst ein CI-Check, der `node shared/sync/sync.mjs --check` bei jedem Push fährt
+(gleicher Einzeiler, Exit ≠ 0 bei Abweichung). Steht noch aus.
+
 ## Sicherheitsinvarianten (in `sync.mjs` implementiert)
 
 Keine absoluten Pfade · kein `..`-Traversal · alle Pfade innerhalb des Repos · keine Symlinks ·

@@ -1,0 +1,25 @@
+#!/bin/sh
+# KAIROS pre-commit — verhindert, dass die gespiegelten Plugin-Kopien unbemerkt von ihrer
+# Quelle unter shared/knowledge/ driften (Details: shared/sync/README.md).
+#
+# Einmalig pro Klon aktivieren:  git config core.hooksPath .githooks
+# Notfall-Bypass:                git commit --no-verify
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "WARNUNG: node nicht gefunden — Sync-Check uebersprungen, Kopien ungeprueft." >&2
+  exit 0
+fi
+
+if node shared/sync/sync.mjs --check >/dev/null 2>&1; then
+  exit 0
+fi
+
+echo ""
+echo "COMMIT ABGEBROCHEN — Plugin-Kopien weichen von ihrer Quelle ab:"
+echo ""
+node shared/sync/sync.mjs --check
+echo ""
+echo "  Fix:    node shared/sync/sync.mjs --sync && git add -u"
+echo "  Regel:  immer shared/knowledge/ aendern, nie plugins/*/reference/"
+echo ""
+exit 1
