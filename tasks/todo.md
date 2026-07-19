@@ -184,3 +184,125 @@ einfügbar ist. Alles andere wird so vermerkt, dass es in **jedem neuen Chat** g
 - [x] `tasks/backlog.md` B5 als Irrtum korrigiert statt still gelöscht — inkl. Grund, damit der
       nächste Agent nicht denselben Refactor erneut vorschlägt
 - [x] Verifiziert: `sync.mjs --check` → 13 Entries, 26 Targets, 0 Errors, Exit 0
+
+---
+
+# S9 (2026-07-17): Kontaktformular anschließen — die Basics stehen lassen
+
+**Auslöser:** Das Template-Formular ist ein `// kontakt form (demo submit)`. Es validiert,
+zeigt „Vielen Dank! Ihre Anfrage ist eingegangen – wir melden uns in Kürze." — und **verwirft
+die Anfrage**. Live auf `pv-fachbetrieb.vercel.app`. Zweites Auftreten derselben Fehlerklasse
+wie die dokumentierte Resend-Falle (stiller Verlust von Anfragen).
+
+**Vorlage:** n8n-Workflow `Gössel — 01 Lead-Empfang` (aktiv seit 2026-04-29). Wird
+**übernommen, nicht neu erfunden** (REGEL 3). Er kann bereits: Form-Key, Honeypot, Time-Trap,
+Pflichtfelder, Telefon→E.164, Lead-ID, **Speichern vor Benachrichtigen**, Error-Workflow.
+
+**Ziel (bewusst klein):** Der Inhaber bekommt jeden Lead als formatierte HTML-Mail ins Postfach.
+Mehr nicht. Alles Weitere → `tasks/backlog.md` §C.
+
+## Schritt 0 — geklärt (2026-07-17)
+
+**Frage war:** Aus welchem Baum werden Kundensites gebaut? Wenn das offen bleibt, teilt der
+Formular-Fix das Schicksal des Consent-Layers: gebaut, nie ausgeliefert.
+
+**Antwort aus der Historie:**
+- `plugins/meisterwerk-miller/template/` ist die **Quelle**. Der Skill baut daraus
+  (`handwerk-site-builder`: „Plugin-`template/` in den Projektordner (`site/`) kopieren").
+- `build-runtime/` ist laut `989ddce` (12.07.) eine „**schlanke Laufzeit-Kopie fuer n8n raw-URL**"
+  — für die automatisierte Prototyp-Pipeline, die das Template per Raw-URL von GitHub zieht.
+- Der Consent-Layer wurde **einen Tag später** autoritativ (`4bd9148`, 13.07.) — **in `plugins/`**.
+  Der Fork hat ihn nie bekommen. Datierter Abzweig, kein Rätsel.
+- **Niemand im Repo verweist auf `build-runtime/`** (kein Sync-Eintrag, keine Doku), und der
+  einzige bekannte Abnehmer `Prototyp-Build (Option A)` ist **archiviert + inaktiv**.
+
+**Folge für S9:** Wir bauen in `plugins/meisterwerk-miller/template/` — das ist unstrittig die
+Quelle. Der fehlende Banner auf der Live-Site erklärt sich damit als **alter Deploy** (vor dem
+13.07.) und/oder als n8n-Pfad. Beides heilt derselbe Schritt: **neu bauen und neu deployen**,
+was für S9 ohnehin nötig ist.
+
+- [ ] **Entscheiden, was mit `build-runtime/` passiert** (blockiert S9 **nicht** mehr, aber es
+      bleibt eine Landmine):
+      **(a)** löschen und n8n auf `plugins/meisterwerk-miller/template/` zeigen lassen — Fork weg,
+      Wurzel behoben; **(b)** behalten und in `sync-manifest.json` aufnehmen — Fork bleibt, kann
+      aber nicht mehr driften; **(c)** so lassen — Drift geht weiter. **Empfehlung: (a)**, sofern
+      die archivierte Pipeline nicht reaktiviert wird. Details: `tasks/backlog.md` §D1.
+
+## Tun
+
+- [ ] **n8n: Workflow „Meisterwerk — Lead-Empfang"** — Klon von Gössel 01, generalisiert:
+      Felder ans Template (`ktVor`/`ktNach`/`ktMail`/`ktTel`/`ktThema`/`ktMsg`), `address`
+      entfällt (nicht im Template), Gmail-Node auf **HTML** statt `emailType: "text"`,
+      Empfänger aus dem Payload statt hartkodiert, `errorWorkflow` anhängen.
+      Sheets-Node **bleibt** — Durchschlag, nicht CRM (Begründung: §C1).
+- [ ] **`config/site.js`:** neuer Block `forms: { endpoint, formKey, notifyEmail }`.
+      Config-getrieben wie alles andere.
+- [ ] **`kontakt/index.html` + `index.html`:** Honeypot-Feld (`website`, versteckt) + `elapsedMs`.
+      Fehlt heute beides — ein offener Webhook ohne Spam-Abwehr wird zugemüllt.
+- [ ] **`main.js`:** `// kontakt form (demo submit)` ersetzen durch echten `fetch` auf
+      `forms.endpoint`. Erfolgsmeldung erst **nach** HTTP 200. Fehlerfall sichtbar machen.
+- [ ] **`build.mjs`: fail-closed Prüfung.** Endpoint gesetzt, kein Platzhalter, kein
+      `demo submit`-Literal mehr im Bundle. **Das ist die Wurzel:** `build.mjs` prüft Consent
+      streng — deshalb geht Consent nicht still kaputt. Das Formular hatte keine Prüfung —
+      deshalb ging es still kaputt.
+- [ ] **`allowedOrigins`** im Webhook auf die Kundendomain setzen (nicht `*`).
+
+## Nicht tun (→ `tasks/backlog.md` §C)
+
+- **Chatbot.** Braucht eine Baseline, die es ohne funktionierendes Formular nicht gibt.
+- **Analytics / Dashboard / CMS / Terminbuchung / SMS / Foto-Upload / Kunden-CRM /
+  Bestätigungsmail an den Anfragenden.** Alles Upsell. Vollständig in §C.
+- **Monitor, `standard.json`, `evaluate.py`:** unangetastet.
+
+## Sicherheit — gehört dir, nicht mir
+
+- [ ] **Slack-Bot-Token rotieren.** Steht im Klartext im HTTP-Header von
+      `KAIROS - Kontaktformular → Slack` (`LeYAP1lM3DbuOQjo`), damit in Historie, Exports,
+      Backups. Danach als n8n-Credential hinterlegen, nativen Slack-Node nutzen.
+- [ ] **Zombie deaktivieren:** derselbe Workflow ist aktiv, empfängt aber nichts —
+      `kairos-digital.de` läuft über Resend. `allowedOrigins` listet nicht mal die
+      Produktionsdomain. Abschalten, nicht reparieren.
+
+## S9 — Stand 2026-07-17 (Hälfte 1 fertig, getestet)
+
+**Template (fertig, verifiziert):**
+- [x] `forms`-Block in `config/site.js` (endpoint, clientId, minRenderMs, texts)
+- [x] `wps-form-config`-Block in `index.html` + `kontakt/index.html` (Muster: Consent-Block)
+- [x] Honeypot (`ktHp`) + Time-Trap (`elapsedMs`) in beide Formulare
+- [x] `main.js`: Attrappen-Handler raus, echter `fetch`. Erfolg erst nach HTTP 200,
+      Fehler wird sichtbar gemeldet statt still verschluckt
+- [x] `build.mjs`: fail-closed Formular-Validierung
+- [x] **Getestet:** Demo-clientId → Exit 1 · echter Kunde → Exit 0 ·
+      Attrappen-Handler zurückgeschmuggelt → von 4 Prüfungen erschlagen ·
+      formKey zurückgeschmuggelt → Exit 1
+
+**Korrektur gegenüber dem ursprünglichen Plan: `formKey` ist raus.**
+Bei Gössel funktioniert er, weil dessen Next.js-Seite ihn *serverseitig* aus einer Vercel-ENV
+schickt. Unser Template ist **statisch** — der Key stünde im ausgelieferten HTML direkt neben der
+Webhook-URL. Reines Theater, und er kostete einen Einrichtungsschritt pro Kunde. Schutz leisten
+Honeypot, Time-Trap und `allowedOrigins`. `build.mjs` bricht ab, falls er zurückkommt.
+
+**n8n (angelegt, INAKTIV):** `Meisterwerk — Lead-Empfang` (`XSKhCP4o2kpPgbDH`), 10 Nodes.
+Data Table `Meisterwerk Kunden` (`VaEpGM4MIKpQbqRa`): clientId · empfaenger · betrieb · aktiv.
+Kunde anlegen = eine Zeile. Empfänger kommt **nie** aus dem Payload (sonst offenes Mail-Relay).
+
+**Kein Google Sheet mehr** (Entscheidung des Nutzers, Aufwand beim Onboarding). Die Sicherheit
+hängt nicht am Sheet, sondern daran, dass ein Fehler **laut** ist — dafür ist der Error-Workflow
+zuständig. **Achtung: der ist noch nicht zugewiesen (siehe offen).**
+
+## S9 — offen, braucht Hand in n8n (kann Claude nicht)
+
+- [ ] **Gmail-Credential** an „Mail an Inhaber" hängen (`Kairos-n8n`) — wurde beim Anlegen
+      *nicht* automatisch übernommen
+- [ ] **`allowedOrigins`** im Webhook setzen (steht auf Platzhalter)
+- [ ] **Error-Workflow zuweisen** (Settings) — ohne ihn ist der Fehler bei unbekanntem
+      Empfänger nur in der Ausführungsliste sichtbar, nicht laut
+- [ ] **Zeile in die Data Table** für den ersten echten Kunden
+- [ ] `forms.clientId` in dessen `config/site.js` auf dieselbe ID
+- [ ] Testanfrage, dann **aktivieren**
+- [ ] Alten Zombie `KAIROS - Kontaktformular → Slack` (`LeYAP1lM3DbuOQjo`) löschen
+
+**Notiz zu `hallo@kairos-digital.de` (2026-07-17):** Kein totes Postfach. KAIROS hat mehrere
+Weiterleitungs-Domains, die alle im selben Postfach landen — `hallo@` ist eine davon. Das Learning
+`2026-07-16_kairos-website-build-next16-vercel.md` beschreibt einen **behobenen** Zustand von damals,
+keinen aktuellen Defekt. `Gössel — 03 Error Handler` schickt dorthin und funktioniert.

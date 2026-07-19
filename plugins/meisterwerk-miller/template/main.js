@@ -96,23 +96,69 @@
   cg.addEventListener('mouseleave', function(){ over=false; });
 })();
 
-// kontakt form (demo submit)
+// kontakt form -> n8n-Webhook (forms.endpoint aus config/site.js).
+// KERNREGEL: Erfolg wird NIE vor HTTP 200 gemeldet. Hier stand frueher ein
+// Attrappen-Handler, der "Ihre Anfrage ist eingegangen" anzeigte und die
+// Anfrage verwarf — der Betrieb hat nie erfahren, dass es sie gab.
+// build.mjs prueft das; siehe dort den Formular-Block.
 (function(){
   var f=document.getElementById('ktForm'); if(!f) return;
   var note=document.getElementById('ktNote');
+  var cfgEl=document.getElementById('wps-form-config');
+  var CFG={}; try{ CFG=JSON.parse(cfgEl.textContent); }catch(e){}
+  var T=CFG.texts||{};
+  var btn=f.querySelector('button[type=submit]');
+  var btnLabel=btn?btn.textContent:'';
+  var renderedAt=Date.now();
+  var busy=false;
+
+  function say(msg,color){
+    note.style.display='block';
+    note.style.color=color;
+    note.textContent=msg;
+  }
+  function val(id){ var el=document.getElementById(id); return el?el.value.trim():''; }
+
   f.addEventListener('submit',function(e){
     e.preventDefault();
-    var mail=document.getElementById('ktMail').value.trim();
+    if(busy) return;
+
+    var mail=val('ktMail');
     var consent=document.getElementById('ktConsent').checked;
-    note.style.display='block';
-    if(!mail || !consent){
-      note.style.color='#8A1F1F';
-      note.textContent='Bitte E-Mail angeben und der Datenschutzerklärung zustimmen.';
-      return;
-    }
-    note.style.color='#1f9d6b';
-    note.textContent='Vielen Dank! Ihre Anfrage ist eingegangen – wir melden uns in Kürze.';
-    f.querySelector('button[type=submit]').textContent='Anfrage gesendet ✓';
+    if(!mail || !consent){ say(T.validation,'#8A1F1F'); return; }
+    if(!CFG.enabled || !CFG.endpoint){ say(T.error,'#8A1F1F'); return; }
+
+    var payload={
+      clientId:  CFG.clientId,                // n8n schlaegt damit den Empfaenger nach
+      vorname:   val('ktVor'),
+      nachname:  val('ktNach'),
+      email:     mail,
+      telefon:   val('ktTel'),
+      thema:     val('ktThema'),
+      nachricht: val('ktMsg'),
+      website:   val('ktHp'),                 // Honeypot — Bots fuellen das aus
+      elapsedMs: Date.now()-renderedAt        // Time-Trap
+    };
+
+    busy=true;
+    if(btn){ btn.disabled=true; btn.textContent=T.sending; }
+    say(T.sending,'#6B7280');
+
+    fetch(CFG.endpoint,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    })
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); })
+    .then(function(){
+      say(T.success,'#1f9d6b');
+      if(btn) btn.textContent=T.sent;
+    })
+    .catch(function(){
+      busy=false;
+      if(btn){ btn.disabled=false; btn.textContent=btnLabel; }
+      say(T.error,'#8A1F1F');   // ehrlich scheitern statt still verlieren
+    });
   });
 })();
 

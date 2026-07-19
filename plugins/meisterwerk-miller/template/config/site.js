@@ -325,6 +325,41 @@ const SITE = {
     placeholderText: "Aktivieren Sie externe Medien, um die interaktive Karte zu laden.",
     settingsLabel: "Cookie-Einstellungen öffnen",
   },
+
+  /* ---- Formular (S9) -------------------------------------------------------
+     `endpoint` = n8n-Webhook "Meisterwerk — Lead-Empfang". Er schickt dem Inhaber
+     eine HTML-Mail. Vorlage war der Workflow "Gössel — 01 Lead-Empfang".
+
+     `clientId` adressiert den Kunden. Die Empfaenger-Adresse steht bewusst NICHT
+     hier und NICHT im Payload — n8n schlaegt sie in der Data Table "Meisterwerk
+     Kunden" nach. Sonst waere der Webhook ein offenes Mail-Relay: jeder koennte
+     per POST beliebige Mails ueber unser Konto verschicken.
+
+     KEIN formKey/Token hier. Auf einer statischen Seite steht jedes "Secret" im
+     ausgelieferten HTML direkt neben der Webhook-URL — wer das eine abschreibt,
+     hat das andere. Das waere Theater. Echte Abwehr: Honeypot + Time-Trap (hier)
+     und allowedOrigins (im Webhook).
+
+     `clientId` auf dem Demo-Wert stehen lassen => `build.mjs` bricht ab
+     (fail-closed). Absicht: nie wieder eine Site mit totem Formular live.
+
+     PRO KUNDE: (1) clientId hier setzen, (2) gleiche ID als Zeile in der n8n-Data-
+     Table "Meisterwerk Kunden" (clientId, empfaenger, betrieb, aktiv=true),
+     (3) Kundendomain in allowedOrigins des Webhooks ergaenzen.
+     ------------------------------------------------------------------------- */
+  forms: {
+    enabled: true,
+    endpoint: "https://n8n.flow-booking.org/webhook/meisterwerk-lead",
+    clientId: "demo-musterwerk",
+    minRenderMs: 2000,
+    texts: {
+      validation: "Bitte E-Mail angeben und der Datenschutzerklärung zustimmen.",
+      sending: "Wird gesendet…",
+      success: "Vielen Dank! Ihre Anfrage ist eingegangen – wir melden uns in Kürze.",
+      sent: "Anfrage gesendet ✓",
+      error: "Ihre Anfrage konnte nicht gesendet werden. Bitte rufen Sie uns kurz an — wir helfen Ihnen sofort weiter.",
+    },
+  },
 };
 
 if (typeof module !== "undefined" && module.exports) module.exports = SITE;

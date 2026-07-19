@@ -13,6 +13,10 @@
 {"enabled":{{consent.enabled}},"version":"{{consent.version}}","validityDays":{{consent.validityDays}},"storageKey":"{{consent.storageKey}}","eventName":"{{consent.eventName}}","categories":{"necessary":{"enabled":{{consent.categories.necessary.enabled}},"required":{{consent.categories.necessary.required}}},"analytics":{"enabled":{{consent.categories.analytics.enabled}},"required":{{consent.categories.analytics.required}}},"marketing":{"enabled":{{consent.categories.marketing.enabled}},"required":{{consent.categories.marketing.required}}},"externalMedia":{"enabled":{{consent.categories.externalMedia.enabled}},"required":{{consent.categories.externalMedia.required}}}},"services":{{json consent.services}},"texts":{"bannerTitle":"{{consent.texts.bannerTitle}}","bannerBody":"{{consent.texts.bannerBody}}","acceptAll":"{{consent.texts.acceptAll}}","acceptNecessary":"{{consent.texts.acceptNecessary}}","settings":"{{consent.texts.settings}}","save":"{{consent.texts.save}}","settingsTitle":"{{consent.texts.settingsTitle}}","settingsIntro":"{{consent.texts.settingsIntro}}","close":"{{consent.texts.close}}","triggerLabel":"{{consent.texts.triggerLabel}}","categories":{"necessary":{"title":"{{consent.texts.categories.necessary.title}}","body":"{{consent.texts.categories.necessary.body}}"},"analytics":{"title":"{{consent.texts.categories.analytics.title}}","body":"{{consent.texts.categories.analytics.body}}"},"marketing":{"title":"{{consent.texts.categories.marketing.title}}","body":"{{consent.texts.categories.marketing.body}}"},"externalMedia":{"title":"{{consent.texts.categories.externalMedia.title}}","body":"{{consent.texts.categories.externalMedia.body}}"}}}}
 </script>
 <script type="module" src="/consent/consent.js"></script>
+<!-- WPS_FORM_HEAD -->
+<script type="application/json" id="wps-form-config">
+{"enabled":{{forms.enabled}},"endpoint":"{{forms.endpoint}}","clientId":"{{forms.clientId}}","minRenderMs":{{forms.minRenderMs}},"texts":{"validation":"{{forms.texts.validation}}","sending":"{{forms.texts.sending}}","success":"{{forms.texts.success}}","sent":"{{forms.texts.sent}}","error":"{{forms.texts.error}}"}}
+</script>
 <!-- IF heroIsV2 -->
 <link rel="preload" as="image" href="{{heroV2.image}}" fetchpriority="high" />
 <link rel="stylesheet" href="/hero-v2/hero-v2.css" />
@@ -401,6 +405,11 @@
         </div>
         <div class="qfield"><label for="ktMsg">Ihr Anliegen</label><textarea class="qinp" id="ktMsg" placeholder="Beschreiben Sie kurz Ihr Vorhaben…"></textarea></div>
         <label class="qconsent"><input type="checkbox" id="ktConsent"><span>Ich stimme der Verarbeitung meiner Angaben gemäß der Datenschutzerklärung zu.</span></label>
+        <!-- Honeypot: fuer Menschen unsichtbar, Bots fuellen es aus -> Anfrage wird verworfen. -->
+        <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">
+          <label for="ktHp">Website (bitte frei lassen)</label>
+          <input id="ktHp" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
         <button class="btn-solid" type="submit">Jetzt kostenlose Beratung anfordern</button>
         <p class="kt-note" id="ktNote" style="display:none"></p>
       </form>

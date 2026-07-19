@@ -220,3 +220,106 @@ if (rg.length) {
   process.exit(1);
 }
 console.log("  ✓ Registry autoritativ (config.consent.services == Browser-JSON auf 5 Seiten, google-maps/externalMedia/enabled, keine offenen Tokens).");
+
+/* ==========================================================================
+ *  Formular-Validierung (S9)
+ *  --------------------------------------------------------------------------
+ *  WARUM ES DIESEN BLOCK GIBT: Das Formular war ein "demo submit" — es zeigte
+ *  "Ihre Anfrage ist eingegangen" und verwarf die Anfrage. Es ging live, weil
+ *  es NICHTS geprueft hat. Consent geht nicht still kaputt, weil es geprueft
+ *  wird. Hier dieselbe Medizin: fail-closed, sonst wiederholt es sich.
+ *
+ *  Geprueft wird der SOURCE (Integrationspunkte) und der OUTPUT (Ergebnis).
+ *  Injiziert wird nichts — gleiche Entscheidung wie beim Consent-Block oben.
+ * ========================================================================== */
+const FORM_PAGES = ["index.html", "kontakt/index.html"];
+const DEMO_CLIENT_IDS = ["demo-musterwerk", "CHANGEME", "TODO", ""];
+const fv = [];
+
+const forms = SITE.forms;
+if (!forms || typeof forms !== "object") {
+  console.error("\n  ✗ Formular: config/site.js enthaelt keinen forms-Block.");
+  process.exit(1);
+}
+
+if (forms.enabled === false) {
+  console.log("  • Formular ist deaktiviert (forms.enabled=false) — Checks uebersprungen.");
+} else {
+  // A) Config: Endpoint muss echt sein. Kein Platzhalter, kein http, keine Luecke.
+  if (typeof forms.endpoint !== "string" || !forms.endpoint) fv.push("config: forms.endpoint fehlt");
+  else {
+    try {
+      const u = new URL(forms.endpoint);
+      if (u.protocol !== "https:") fv.push(`config: forms.endpoint ist nicht https (${u.protocol})`);
+    } catch { fv.push("config: forms.endpoint ist keine gueltige URL"); }
+  }
+  // clientId adressiert den Empfaenger: n8n schlaegt die Mail-Adresse darueber in
+  // der Data Table "Meisterwerk Kunden" nach, damit der Webhook kein offenes
+  // Mail-Relay wird. Der Demo-Wert muss pro Kunde ersetzt werden — sonst gingen
+  // die Anfragen an den falschen Betrieb oder nirgendwohin.
+  if (typeof forms.clientId !== "string" || !forms.clientId.trim()) {
+    fv.push("config: forms.clientId fehlt — ohne sie kann n8n den Empfaenger nicht aufloesen");
+  } else if (DEMO_CLIENT_IDS.includes(forms.clientId.trim())) {
+    fv.push(`config: forms.clientId ist noch der Demo-Wert ('${forms.clientId}') — pro Kunde ersetzen und dieselbe ID als Zeile in der n8n-Data-Table "Meisterwerk Kunden" anlegen`);
+  }
+  // Kein Token/formKey: auf einer statischen Seite stuende er im HTML neben der
+  // Webhook-URL. Taucht er wieder auf, ist jemand dieser Illusion aufgesessen.
+  if (forms.formKey !== undefined) {
+    fv.push("config: forms.formKey ist zurueck — auf einer statischen Seite ist das kein Secret, sondern steht im ausgelieferten HTML. Entfernen; Schutz leisten Honeypot, Time-Trap und allowedOrigins.");
+  }
+  if (!Number.isFinite(forms.minRenderMs) || forms.minRenderMs < 1000) {
+    fv.push(`config: forms.minRenderMs=${forms.minRenderMs} (>=1000 erwartet, Time-Trap)`);
+  }
+  for (const t of ["validation", "sending", "success", "sent", "error"]) {
+    if (!forms.texts || typeof forms.texts[t] !== "string" || !forms.texts[t]) fv.push(`config: forms.texts.${t} fehlt`);
+  }
+
+  // B) Formular-Seiten (Source): Head-Block, Config, Honeypot — je genau 1×
+  for (const rel of FORM_PAGES) {
+    const html = readFileSync(join(HERE, rel), "utf8");
+    const checks = {
+      "WPS_FORM_HEAD": count(html, "<!-- WPS_FORM_HEAD -->"),
+      'id="wps-form-config"': count(html, 'id="wps-form-config"'),
+      'id="ktHp"': count(html, 'id="ktHp"'),      // Honeypot
+      'id="ktForm"': count(html, 'id="ktForm"'),
+    };
+    for (const [k, n] of Object.entries(checks)) {
+      if (n !== 1) fv.push(`${rel}: '${k}' erwartet 1×, gefunden ${n}×`);
+    }
+  }
+
+  // C) Formular-Seiten (Output): genau 1 Config-Block, gueltiges JSON, Werte == SITE.forms
+  const FORM_CFG_RE = /<script type="application\/json" id="wps-form-config">\s*([\s\S]*?)\s*<\/script>/g;
+  for (const rel of FORM_PAGES) {
+    const html = readFileSync(join(OUT, rel), "utf8");
+    const blocks = [...html.matchAll(FORM_CFG_RE)];
+    if (blocks.length !== 1) { fv.push(`${rel}: #wps-form-config ${blocks.length}× (erwartet 1)`); continue; }
+    let parsed;
+    try { parsed = JSON.parse(blocks[0][1]); } catch (e) { fv.push(`${rel}: Form-Config-JSON ungueltig (${e.message})`); continue; }
+    if (parsed.endpoint !== forms.endpoint) fv.push(`${rel}: Browser-endpoint != SITE.forms.endpoint`);
+    if (parsed.clientId !== forms.clientId) fv.push(`${rel}: Browser-clientId != SITE.forms.clientId`);
+  }
+
+  // D) Nicht-Formular-Seiten (Output): kein verwaister Config-Block
+  for (const rel of PAGES.filter((p) => !FORM_PAGES.includes(p))) {
+    const html = readFileSync(join(OUT, rel), "utf8");
+    if (html.includes('id="wps-form-config"')) fv.push(`${rel}: unerwarteter #wps-form-config (keine Form auf der Seite)`);
+  }
+
+  // E) Output-main.js: der Demo-Handler darf NICHT zurueckkommen, der fetch muss da sein.
+  const outMain = existsSync(join(OUT, "main.js")) ? readFileSync(join(OUT, "main.js"), "utf8") : "";
+  if (!outMain) fv.push("Output fehlt: main.js (render-all copy?)");
+  else {
+    if (/demo submit/i.test(outMain)) fv.push("main.js: 'demo submit' ist zurueck — das Formular verwirft Anfragen");
+    if (!outMain.includes("wps-form-config")) fv.push("main.js: liest #wps-form-config nicht");
+    if (!/fetch\(\s*CFG\.endpoint/.test(outMain)) fv.push("main.js: kein fetch auf CFG.endpoint");
+    if (!/r\.ok/.test(outMain)) fv.push("main.js: Antwort wird nicht geprueft (Erfolg koennte vor HTTP 200 gemeldet werden)");
+  }
+
+  if (fv.length) {
+    console.error("\n  ✗ Formular-Validierung fehlgeschlagen:");
+    for (const m of fv) console.error("     - " + m);
+    process.exit(1);
+  }
+  console.log(`  ✓ Formular verdrahtet (Endpoint https, Honeypot + Time-Trap auf 2 Seiten, Erfolg erst nach HTTP 200).`);
+}
