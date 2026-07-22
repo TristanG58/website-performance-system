@@ -323,3 +323,103 @@ if (forms.enabled === false) {
   }
   console.log(`  ✓ Formular verdrahtet (Endpoint https, Honeypot + Time-Trap auf 2 Seiten, Erfolg erst nach HTTP 200).`);
 }
+
+/* ==========================================================================
+ *  Chat-Validierung (S10)
+ *  --------------------------------------------------------------------------
+ *  WARUM ES DIESEN BLOCK GIBT: Ein Chatbot kann auf drei Arten still kaputt
+ *  gehen, und alle drei sieht man der Seite nicht an.
+ *
+ *  1. Falsche clientId → n8n findet keinen Kontext, jeder Besucher bekommt nur
+ *     "bitte Kontaktformular". Der Bot ist da, aber er weiss nichts.
+ *  2. clientId != forms.clientId → Chat und Formular zeigen auf zwei
+ *     verschiedene Zeilen. Eine davon existiert nicht.
+ *  3. innerHTML statt textContent → der Bot gibt Text aus, den ein Sprachmodell
+ *     nach dem Lesen von Besuchereingaben erzeugt hat. Als HTML eingesetzt ist
+ *     das eine Ausfuehrungsluecke auf der Seite des Kunden.
+ *
+ *  Wie beim Formular: fail-closed, Source UND Output, nichts injizieren.
+ * ========================================================================== */
+const cv = [];
+const chat = SITE.chat;
+
+if (!chat || typeof chat !== "object") {
+  console.log("  • Kein chat-Block in config/site.js — Chat-Checks uebersprungen.");
+} else if (chat.enabled === false) {
+  console.log("  • Chat ist deaktiviert (chat.enabled=false) — Checks uebersprungen.");
+} else {
+  // A) Config
+  if (typeof chat.endpoint !== "string" || !chat.endpoint) cv.push("config: chat.endpoint fehlt");
+  else {
+    try {
+      const u = new URL(chat.endpoint);
+      if (u.protocol !== "https:") cv.push(`config: chat.endpoint ist nicht https (${u.protocol})`);
+    } catch { cv.push("config: chat.endpoint ist keine gueltige URL"); }
+  }
+  if (typeof chat.clientId !== "string" || !chat.clientId.trim()) {
+    cv.push("config: chat.clientId fehlt — ohne sie findet n8n den Website-Kontext nicht");
+  } else if (DEMO_CLIENT_IDS.includes(chat.clientId.trim())) {
+    cv.push(`config: chat.clientId ist noch der Demo-Wert ('${chat.clientId}') — pro Kunde ersetzen`);
+  }
+  // Chat und Formular muessen dieselbe Zeile der Data Table treffen.
+  if (SITE.forms && chat.clientId !== SITE.forms.clientId) {
+    cv.push(`config: chat.clientId ('${chat.clientId}') != forms.clientId ('${SITE.forms.clientId}') — beide schlagen dieselbe Zeile in "Meisterwerk Kunden" nach, eine davon geht ins Leere`);
+  }
+  // Der Kontext gehoert NICHT in die Config: er wuerde im ausgelieferten HTML
+  // stehen und liesse sich im Payload durch beliebige "Fakten" ersetzen.
+  if (chat.kontext !== undefined || chat.context !== undefined) {
+    cv.push("config: chat.kontext gehoert nicht hierher — er stuende im ausgelieferten HTML und waere im Payload manipulierbar. Er gehoert in die Spalte kontext der n8n-Data-Table (node chat-context.mjs).");
+  }
+  // Chatverlaeufe sind personenbezogene Daten. Ohne Hinweis darf niemand tippen.
+  if (typeof chat.privacyHref !== "string" || !chat.privacyHref.trim()) {
+    cv.push("config: chat.privacyHref fehlt — Chatverlaeufe sind personenbezogene Daten, der Hinweis ist Pflicht");
+  }
+  if (!chat.texts || typeof chat.texts.privacy !== "string" || !chat.texts.privacy.trim()) {
+    cv.push("config: chat.texts.privacy fehlt — siehe chat.privacyHref");
+  }
+  for (const t of ["launcher", "title", "intro", "placeholder", "send", "sending", "error", "close"]) {
+    if (!chat.texts || typeof chat.texts[t] !== "string" || !chat.texts[t]) cv.push(`config: chat.texts.${t} fehlt`);
+  }
+
+  // B) Source: Head-Block auf allen 5 Seiten, je genau 1×
+  for (const rel of PAGES) {
+    const html = readFileSync(join(HERE, rel), "utf8");
+    for (const k of ["<!-- WPS_CHAT_HEAD -->", 'id="wps-chat-config"']) {
+      const n = count(html, k);
+      if (n !== 1) cv.push(`${rel}: '${k}' erwartet 1×, gefunden ${n}×`);
+    }
+  }
+
+  // C) Output: gueltiges JSON, Werte == SITE.chat
+  const CHAT_CFG_RE = /<script type="application\/json" id="wps-chat-config">\s*([\s\S]*?)\s*<\/script>/g;
+  for (const rel of PAGES) {
+    const html = readFileSync(join(OUT, rel), "utf8");
+    const blocks = [...html.matchAll(CHAT_CFG_RE)];
+    if (blocks.length !== 1) { cv.push(`${rel}: #wps-chat-config ${blocks.length}× (erwartet 1)`); continue; }
+    let parsed;
+    try { parsed = JSON.parse(blocks[0][1]); } catch (e) { cv.push(`${rel}: Chat-Config-JSON ungueltig (${e.message})`); continue; }
+    if (parsed.endpoint !== chat.endpoint) cv.push(`${rel}: Browser-endpoint != SITE.chat.endpoint`);
+    if (parsed.clientId !== chat.clientId) cv.push(`${rel}: Browser-clientId != SITE.chat.clientId`);
+    if (!parsed.privacyHref) cv.push(`${rel}: Chat-Config ohne privacyHref`);
+  }
+
+  // D) Output-main.js: Bot-Antworten nur als Text, Fehler ehrlich melden.
+  const outMain2 = existsSync(join(OUT, "main.js")) ? readFileSync(join(OUT, "main.js"), "utf8") : "";
+  if (!outMain2) cv.push("Output fehlt: main.js (render-all copy?)");
+  else {
+    const chatTeil = outMain2.slice(outMain2.indexOf("wps-chat-config"));
+    if (!outMain2.includes("wps-chat-config")) cv.push("main.js: liest #wps-chat-config nicht");
+    if (!/fetch\(\s*CFG\.endpoint/.test(chatTeil)) cv.push("main.js: kein fetch auf CFG.endpoint im Chat-Teil");
+    if (/\.innerHTML\s*=/.test(chatTeil)) {
+      cv.push("main.js: innerHTML im Chat-Teil — Bot-Text ist modellgenerierter Inhalt und darf nie als HTML eingesetzt werden. textContent verwenden.");
+    }
+    if (!/\.ok\b/.test(chatTeil)) cv.push("main.js: HTTP-Status wird im Chat-Teil nicht geprueft");
+  }
+
+  if (cv.length) {
+    console.error("\n  ✗ Chat-Validierung fehlgeschlagen:");
+    for (const m of cv) console.error("     - " + m);
+    process.exit(1);
+  }
+  console.log(`  ✓ Chat verdrahtet (Endpoint https, clientId == forms.clientId, Antworten als Text, Datenschutzhinweis vorhanden).`);
+}

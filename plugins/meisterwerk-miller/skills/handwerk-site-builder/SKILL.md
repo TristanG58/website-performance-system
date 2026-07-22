@@ -88,8 +88,18 @@ die fertigen Seiten. Feld-Referenz: **`reference/tokens.md`** (76 Skalare · 25 
    `services[].img`, `team.members[].img`, `about.*`, `brands[].src`, `aboutIntro.images[].src` …).
    Aufbereitung (WebP/DSGVO): `reference/resources.md`.
 4. **Domain** → `seo.siteUrl` setzen; `render-all.mjs` generiert `robots.txt` + `sitemap.xml` (5 URLs) daraus.
+5. **Formular + Chat verdrahten** — beide zeigen auf dieselbe Zeile in n8n:
+   - `forms.clientId` **und** `chat.clientId` auf dieselbe neue Kennung setzen (z. B. `dachdecker-mueller`).
+     Stimmen sie nicht überein, bricht `build.mjs` ab — eine der beiden liefe sonst ins Leere.
+   - In der n8n-Data-Table **„Meisterwerk Kunden"** eine Zeile anlegen: `clientId`, `empfaenger`
+     (Mail des Inhabers), `betrieb`, `aktiv = true`.
+   - **Bot-Wissen erzeugen:** `node chat-context.mjs` → Ausgabe in die Spalte `kontext` derselben
+     Zeile kopieren. Das Skript verweigert die Ausgabe, solange noch Demo-Platzhalter drinstehen.
+     **Nach jeder späteren Änderung an `config/site.js` neu erzeugen und ersetzen** — sonst erzählt
+     der Bot den Stand von vorgestern, und niemand merkt es.
+   - Kundendomain in `allowedOrigins` **beider** Webhooks ergänzen (Lead-Empfang und Chat).
 
-**Danach: `node render-all.mjs`** → schreibt die fertigen HTML-Seiten + Assets nach `site/`.
+**Danach: `node build.mjs`** → rendert die Seiten nach `site/` und prüft sie (siehe Phase 5).
 **Tabu:** Struktur/Layout/CSS-Klassen/Animationen/Signatur-Komponenten (3D-Team-Karussell,
 Sticky-Footer, Quiz-Funnel, Marquee)/Sektionsreihenfolge — alles fix. Personalisiert wird
 **ausschließlich `config/site.js`** (+ Theme-Farben, Bild-URLs). HTML-Partials werden **nie** von Hand editiert.
@@ -101,10 +111,21 @@ Sticky-Footer, Quiz-Funnel, Marquee)/Sektionsreihenfolge — alles fix. Personal
 `robots.txt` mit echter Domain, lokale Keywords (Dienstleistung + Ort) in Title/H1.
 
 ## PHASE 5 — Rendern
-`node render-all.mjs` — füllt die tokenisierten Seiten aus `config/site.js`, injiziert Theme +
-Hero-/Quiz-BG in `styles.css` und generiert `robots.txt` + `sitemap.xml` (5 URLs). Schreibt alles
-nach `site/`. Vorschau: `python3 -m http.server 4322` im `site/`-Ordner. Kein npm-Build nötig — die
-Seiten sind statisch. (`node build.mjs` ist ein Alias auf `render-all.mjs`.) Für Deploy siehe Phase 7.
+**`node build.mjs`** — rendert die Seiten **und prüft sie danach**. Immer diesen Befehl nehmen.
+
+`build.mjs` füllt die tokenisierten Seiten aus `config/site.js`, injiziert Theme + Hero-/Quiz-BG in
+`styles.css`, generiert `robots.txt` + `sitemap.xml` (5 URLs) — und läuft dann durch die Prüfungen
+für Consent, Self-Host, Maps-Gating, Registry, **Formular und Chat**. Schlägt eine fehl, bricht der
+Build mit Exit-Code 1 ab und sagt in Klartext, was fehlt. Schreibt alles nach `site/`.
+
+> **`node render-all.mjs` rendert NUR und prüft NICHTS.** Es ist kein Alias — es ist der halbe Weg.
+> Wer damit ausliefert, bekommt eine Seite, die genauso aussieht, aber deren Formular Anfragen
+> verwerfen und deren Chatbot die Demo-Firma „Musterwerk Bedachungen" nennen kann, ohne dass es
+> irgendwo auffällt. Genau diese Fehler sind hier schon passiert; die Prüfungen sind die Antwort
+> darauf. `render-all.mjs` nur zum schnellen Zwischenschauen.
+
+Vorschau: `python3 -m http.server 4322` im `site/`-Ordner. Kein npm-Build nötig — die Seiten sind
+statisch. Für Deploy siehe Phase 7.
 
 ## PHASE 6 — Qualitäts-Kontrolle (Pflicht, im Browser)
 **Real prüfen** (Dev-Server / Vercel-Preview). Checkliste:
@@ -145,5 +166,5 @@ auf Unterseiten). Übergabe-Notiz: GBP pflegen, echte Bewertungen sammeln, NAP �
 projekt/
 ├─ research/   01-extrakt.md · 02-qc.md
 ├─ assets/     (gescrapte Logos/Fotos)
-└─ site/       (Klon von template/)  → nur config/site.js füllen → node render-all.mjs → python3 -m http.server 4322
+└─ site/       (Klon von template/)  → nur config/site.js füllen → node build.mjs → python3 -m http.server 4322
 ```

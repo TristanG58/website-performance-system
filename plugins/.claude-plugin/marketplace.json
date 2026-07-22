@@ -14,7 +14,7 @@
       "name": "meisterwerk-miller",
       "source": "./meisterwerk-miller",
       "description": "Meisterwerk v2 (Miller-Edition) — Dachdecker-Website-Werk auf Basis der Miller-Struktur: Navy + Steel-Blue, Albert Sans, 3D-Team-Karussell, Sticky-Reveal-Footer, Quiz-Funnel, GSAP-Animationen. Plain HTML/CSS/JS, config-getrieben, 1:1 replizierbar.",
-      "version": "2.2.0"
+      "version": "2.3.0"
     }
   ]
 }

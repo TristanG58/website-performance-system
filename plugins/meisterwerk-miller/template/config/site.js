@@ -360,6 +360,45 @@ const SITE = {
       error: "Ihre Anfrage konnte nicht gesendet werden. Bitte rufen Sie uns kurz an — wir helfen Ihnen sofort weiter.",
     },
   },
+
+  /* ---- Chat-Assistent (S10) ------------------------------------------------
+     `endpoint` = n8n-Webhook "Meisterwerk — Chat". Die KI bekommt den Inhalt
+     dieser Website als Kontext und antwortet frei auf Fragen zum Betrieb.
+
+     `clientId` MUSS mit forms.clientId uebereinstimmen — n8n schlaegt darueber
+     dieselbe Zeile nach. Der Website-Inhalt fuer den Bot steht in der Spalte
+     `kontext` derselben Zeile, NICHT hier und NICHT im Payload: kaeme er aus
+     dem Browser, koennte jeder Besucher dem Bot beliebige "Fakten" ueber den
+     Betrieb unterschieben — Preise, Zusagen, Leistungen, die es nicht gibt.
+
+     Kontext erzeugen:  node chat-context.mjs
+     Ausgabe in die Data-Table-Zeile kopieren. NACH JEDER AENDERUNG AN DIESER
+     DATEI neu erzeugen, sonst erzaehlt der Bot den Stand von vorgestern.
+
+     Der Bot sagt nie einen Termin und nie einen Festpreis zu (Regeln stecken im
+     Systemprompt des Workflows). Bei allem Konkreten verweist er aufs Formular.
+     Faellt irgendetwas aus, sagt er das ehrlich — er erfindet nichts.
+
+     `privacyHref` ist Pflicht: Chatverlaeufe sind personenbezogene Daten, der
+     Besucher muss vor dem Tippen sehen, woran er ist.
+     ------------------------------------------------------------------------- */
+  chat: {
+    enabled: true,
+    endpoint: "https://n8n.flow-booking.org/webhook/meisterwerk-chat",
+    clientId: "demo-musterwerk",
+    privacyHref: "/datenschutz",
+    texts: {
+      launcher: "Fragen? Jetzt fragen",
+      title: "Ihre Frage an uns",
+      intro: "Stellen Sie Ihre Frage — ich antworte mit dem, was auf dieser Website steht. Fuer Termine und Angebote leite ich Sie ans Kontaktformular weiter.",
+      privacy: "Ihre Fragen werden zur Beantwortung verarbeitet und nach 30 Tagen geloescht. Mehr dazu in der Datenschutzerklärung.",
+      placeholder: "Ihre Frage…",
+      send: "Senden",
+      sending: "Einen Moment…",
+      error: "Die Antwort kam nicht durch. Bitte nutzen Sie das Kontaktformular oder rufen Sie an.",
+      close: "Schließen",
+    },
+  },
 };
 
 if (typeof module !== "undefined" && module.exports) module.exports = SITE;

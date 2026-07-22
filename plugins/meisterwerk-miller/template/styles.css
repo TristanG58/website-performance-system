@@ -20,7 +20,12 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:var(--hf);color:var(--ink);background:#fff;line-height:1.4;letter-spacing:-.1px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{font-family:var(--hf);color:var(--ink);background:#fff;line-height:1.4;letter-spacing:-.1px;-webkit-font-smoothing:antialiased;overflow-x:clip}
+/* overflow-x:clip statt hidden — bewusst. `hidden` macht den Body zu einem
+   Scroll-Container: ScrollTrigger hält dann die volle Dokumenthöhe für die
+   Viewport-Höhe, alle Trigger gelten beim Laden als überschritten, onEnter
+   feuert nie — und position:sticky bricht ebenfalls. `clip` unterbindet
+   waagerechtes Scrollen genauso, erzeugt aber keinen Scroll-Container. */
 h1,h2,h3,h4{font-weight:700;line-height:1.2;letter-spacing:-.4px}
 a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
@@ -175,8 +180,12 @@ textarea.qinp{height:auto;min-height:96px;padding:12px 14px;resize:vertical}
 .reason h3{font-size:22px;color:var(--dark);margin-bottom:10px;letter-spacing:-.3px;font-weight:700}
 .reason p{font-size:16px;line-height:1.55;color:rgba(28,63,96,.72)}
 .vt-gallery{margin-top:70px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
-.vt-track{display:flex;gap:16px;width:max-content;animation:marq 60s linear infinite}
-.vt-track img{height:220px;width:auto;border-radius:4px;object-fit:cover}
+/* Abstand als margin-right, NICHT als flex-gap: bei `gap` ist die Spur
+   2n·Bild + (2n−1)·Abstand breit, eine Kopie aber n·Bild + n·Abstand. Die
+   Animation auf -50% sprang deshalb bei jedem Durchlauf um einen halben
+   Abstand zurück. Mit margin-right ist eine Kopie exakt die halbe Spur. */
+.vt-track{display:flex;width:max-content;animation:marq 60s linear infinite}
+.vt-track img{height:220px;width:auto;margin-right:16px;border-radius:4px;object-fit:cover}
 @media(max-width:820px){.reasons{grid-template-columns:1fr;gap:32px}.vorteile{padding:64px 0}}
 
 /* ---------- TEAM ---------- */
@@ -395,3 +404,111 @@ html.anim-on :is(.sec-head,.svc-card,.reason,.vt-top,.vcard,.job,.lst-row,.split
 .split:hover .im img{transform:scale(1.05)}
 .lst-img{transition:transform .7s cubic-bezier(.2,.6,.2,1)}
 .lst-row:hover .lst-img{transform:scale(1.05)}
+
+/* ---------- CHAT-ASSISTENT ----------
+   Rechts unten, ueber allem ausser dem Consent-Banner (z-index dort hoeher).
+   Auf dem Handy nimmt das Panel die volle Breite. */
+.chat-launcher{position:fixed;right:20px;bottom:20px;z-index:70;border:0;cursor:pointer;
+  background:var(--dark);color:#fff;font-family:var(--hf);font-size:15px;font-weight:600;
+  padding:14px 22px;border-radius:999px;box-shadow:0 12px 30px -10px rgba(28,63,96,.5);
+  transition:transform .18s ease,box-shadow .18s ease}
+.chat-launcher:hover{transform:translateY(-2px);box-shadow:0 16px 36px -10px rgba(28,63,96,.55)}
+.chat-launcher:focus-visible{outline:3px solid var(--key1);outline-offset:3px}
+
+.chat-panel{position:fixed;right:20px;bottom:20px;z-index:71;width:min(380px,calc(100vw - 40px));
+  display:flex;flex-direction:column;background:#fff;border-radius:16px;overflow:hidden;
+  box-shadow:0 24px 60px -18px rgba(28,63,96,.45);border:1px solid var(--line)}
+.chat-panel[hidden]{display:none}
+
+.chat-head{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--dark);color:#fff;padding:16px 18px;font-size:16px}
+.chat-close{background:none;border:0;color:#fff;font-size:26px;line-height:1;cursor:pointer;padding:0 4px}
+.chat-close:focus-visible{outline:2px solid #fff;outline-offset:2px}
+
+.chat-log{flex:1;overflow-y:auto;max-height:min(46vh,380px);padding:16px;display:flex;
+  flex-direction:column;gap:10px;background:var(--light)}
+.chat-msg{max-width:86%;padding:10px 14px;border-radius:14px;font-size:15px;line-height:1.5;
+  white-space:pre-wrap;overflow-wrap:anywhere}
+.chat-bot{align-self:flex-start;background:#fff;color:var(--ink);border:1px solid var(--line)}
+.chat-user{align-self:flex-end;background:var(--dark);color:#fff}
+
+.chat-form{display:flex;gap:8px;padding:12px 14px 0}
+.chat-input{flex:1;min-width:0;font-family:var(--hf);font-size:15px;color:var(--ink);
+  padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.chat-input:focus{outline:2px solid var(--key1);outline-offset:-1px}
+.chat-send{border:0;cursor:pointer;background:var(--btn);color:#fff;font-family:var(--hf);
+  font-size:15px;font-weight:600;padding:11px 18px;border-radius:10px}
+.chat-send[disabled]{opacity:.55;cursor:default}
+.chat-send:focus-visible{outline:3px solid var(--key1);outline-offset:2px}
+
+.chat-privacy{padding:10px 14px 14px;font-size:12px;line-height:1.45;color:var(--muted)}
+.chat-privacy a{text-decoration:underline}
+
+@media (max-width:520px){
+  .chat-panel{right:10px;left:10px;bottom:10px;width:auto}
+  .chat-launcher{right:12px;bottom:12px}
+  .chat-log{max-height:52vh}
+}
+@media (prefers-reduced-motion:reduce){
+  .chat-launcher{transition:none}
+  .chat-launcher:hover{transform:none}
+}
+
+/* ============================================================================
+   Mobile-Fixes (Backport aus dem Krause-Build 2026-07) — nur additiv,
+   keine der Signatur-Mechaniken des Templates wird überschrieben.
+   ========================================================================== */
+
+/* ---- Mobile-Navigation (Handler dazu in main.js, Block "Mobile-Navigation") ---- */
+@media(max-width:980px){
+  body.nav-open{overflow:hidden}
+  body.nav-open .hnav{
+    display:flex;flex-direction:column;align-items:stretch;gap:0;
+    position:fixed;left:0;right:0;top:var(--hh,72px);
+    background:#fff;border-top:1px solid var(--line);
+    box-shadow:0 24px 48px -24px rgba(0,0,0,.32);
+    padding:8px 20px 20px;z-index:60;
+    max-height:calc(100dvh - var(--hh,72px));overflow-y:auto
+  }
+  body.nav-open .hnav a{
+    padding:16px 4px;font-size:18px;border-bottom:1px solid var(--line)
+  }
+  body.nav-open .hnav a:last-of-type{border-bottom:0}
+  /* Der geklonte CTA laeuft im Fluss der Liste mit — keine Pixelrechnung. */
+  body.nav-open .hnav .hnav-cta{
+    display:inline-flex;align-items:center;justify-content:center;
+    background:var(--btn);color:#fff;font-weight:600;font-size:16px;
+    height:54px;border-radius:4px;margin-top:16px;border-bottom:0
+  }
+  .hburger{position:relative;z-index:62}
+  .hburger span{transition:transform .25s ease,opacity .2s ease}
+  body.nav-open .hburger span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  body.nav-open .hburger span:nth-child(2){opacity:0}
+  body.nav-open .hburger span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+}
+
+/* Der geklonte Menue-CTA existiert nur fuer das offene Mobilpanel.
+   Ausserhalb davon — insbesondere auf dem Desktop — bleibt er verborgen,
+   sonst steht der Header-CTA zweimal auf der Seite. */
+.hnav .hnav-cta{display:none}
+
+/* ---- Team-Karussell: Touch-Bedienung (Handler in main.js) ---- */
+/* pan-y: senkrechtes Scrollen bleibt beim Browser, waagerechtes Wischen
+   übernimmt das Skript. Ohne das klebt die Seite beim Vorbeiwischen fest. */
+.cg{touch-action:pan-y}
+.cg-card{cursor:grab;-webkit-user-select:none;user-select:none}
+.cg-card img{-webkit-user-drag:none;pointer-events:none}
+.cg:active .cg-card{cursor:grabbing}
+/* Angetippte Karte verhält sich wie eine überfahrene — auf dem Handy der
+   einzige Weg zum Detailtext. Die Meta-Flaeche uebernimmt dabei die ganze
+   Karte: laengere Texte liefen sonst oben aus der Karte heraus. */
+.cg-card.is-active .cg-meta{
+  top:0;bottom:auto;height:100%;overflow-y:auto;overscroll-behavior:contain;
+  background:rgba(10,22,34,.93);display:flex;flex-direction:column;
+  padding:16px;gap:2px
+}
+.cg-card.is-active .cg-meta .bio{max-height:none;opacity:1;margin-top:10px}
+.cg-card.is-active::after{
+  background:linear-gradient(to top,rgba(10,22,34,.96) 0%,rgba(10,22,34,.8) 50%,rgba(10,22,34,.12) 100%)
+}
+.cg-card.is-active{outline:2px solid var(--key1);outline-offset:2px}
