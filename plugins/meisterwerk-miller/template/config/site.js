@@ -207,6 +207,20 @@ const SITE = {
     ],
   },
 
+  /* ---- Zusagen-Block (unter dem Absende-Button beider Kontaktformulare) ----
+     Spezifische Zusagen statt "Zufriedenheitsgarantie"-Badge. REGEL (Service-
+     Garantie nach Hormozi): nur zusagen, was der Betrieb SELBST kontrolliert
+     (Prozess/Leistung: Festpreis, Reaktionszeit, Baustelle), nie Ergebnisse
+     Dritter. Konkret und falsifizierbar formulieren — sonst Punkt streichen.
+     Kein passender Inhalt => Block auf null, er entfaellt komplett. ---- */
+  garantie: {
+    items: [
+      "Verbindliches Festpreis-Angebot — was wir vereinbaren, gilt",
+      "Rückmeldung innerhalb von 24 Stunden",
+      "Baustelle jeden Abend aufgeräumt",
+    ],
+  },
+
   /* ---- Team (3D-Karussell) — 4 fiktive Demo-Personen ---- */
   team: {
     eyebrow: "Bei uns packen echte Profis an",

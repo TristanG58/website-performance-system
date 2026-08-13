@@ -213,6 +213,11 @@ textarea.qinp{height:auto;min-height:96px;padding:12px 14px;resize:vertical}
 /* ---------- BEWERBUNG (karriere) ---------- */
 .bw-wrap{max-width:640px;margin:0 auto}
 
+/* ---------- ZUSAGEN am Absende-Button ---------- */
+.gu-list{list-style:none;margin-top:16px;display:grid;gap:8px}
+.gu-list li{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;line-height:1.4;color:var(--muted)}
+.gu-list svg{width:15px;height:15px;flex:none;margin-top:1.5px;color:var(--key1)}
+
 /* ---------- TEAM ---------- */
 .team{background:#fff;padding:100px 0}
 .team .sec-head{margin-bottom:0}

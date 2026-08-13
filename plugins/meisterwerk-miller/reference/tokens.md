@@ -15,7 +15,8 @@ liefert die Claude-Extraktion genau diese Felder.
 > enthält der Wert die Entity ebenfalls, weil roh eingesetzt wird. Werte mit `<`, `>`, `&`, `"` müssen
 > also HTML-sicher geliefert werden.
 
-Bilanz: **76 unterschiedliche Skalar-Tokens · 25 REPEAT-Blöcke (11 Arrays, teils mehrfach genutzt) · 3 IF-Blöcke.**
+Bilanz (Stand v2.3.0): **76 unterschiedliche Skalar-Tokens · 25 REPEAT-Blöcke (11 Arrays, teils mehrfach genutzt) · 3 IF-Blöcke.**
+Dazu seit dem Conversion-Umbau 2026-08-13 die Tokens aus dem **Nachtrag ganz unten** (Trust, Kundenstimmen, Zusagen, Bewerbung).
 
 ---
 
@@ -177,3 +178,49 @@ Die Engine berechnet sie aus `heroVariant`. Im Template steuern `<!-- IF heroIsV
 **Trigger-Regel (für n8n / Extraktion):** Enthält die Slack-Lead-Nachricht „v2 hero", „Kairos-Hero" oder „Scroll-Hero" → `heroVariant: "v2"`. Sonst (bzw. bei „v1") → `heroVariant: "v1"`.
 
 **Zusatzdateien:** `template/hero-v2/hero-v2.css` und `hero-v2.js` (verbatim aus dem Plugin, unverändert). Werden nur bei v2 eingebunden. Müssen mit deployt werden.
+
+---
+
+## Nachtrag 2026-08-13 — Conversion-Umbau (M1–M3)
+
+Neue Tokens/Blöcke des Conversion-Umbaus (Commit `8eb95e2` ff.). Alle Blöcke sind
+**IF-gated**: Feld auf `null` ⇒ Sektion/Zeile entfällt komplett. **Inhaltsregeln
+im site-builder-Skill, Phase 3 Schritt 6** (nur echte Google-Werte, Zusagen nur
+über Kontrollierbares, keine erfundenen Bewertungen).
+
+### hero.trust (Trust-Zeile unter dem Hero-CTA, beide Hero-Varianten)
+| Token | Beschreibung | Beispielwert (Demo) |
+|---|---|---|
+| `{{hero.trust.value}}` | Echter Google-Schnitt | `4,9` |
+| `{{hero.trust.count}}` | Echte Anzahl + Quelle | `36 Bewertungen bei Google` |
+
+IF-Block: `<!-- IF hero.trust -->` (index.html, v1 **und** v2-Hero).
+Hinweis: `hero.button.href` zeigt seit dem Umbau auf `#beratung` (Quiz-Anker auf
+der Home) statt auf `/kontakt`.
+
+### testimonials (Kundenstimmen-Sektion, Home, zwischen Vorteilen und Team)
+| Token | Beschreibung |
+|---|---|
+| `{{testimonials.eyebrow}}` / `{{testimonials.h2}}` | Sektionskopf |
+| `{{testimonials.google.value}}` / `{{testimonials.google.count}}` | Google-Badge (echter Schnitt + Anzahl) |
+| REPEAT `testimonials.items` → `{{.text}}`, `{{.name}}`, `{{.place}}` | Einzelne Bewertungen, wörtlich |
+
+IF-Blöcke: `<!-- IF testimonials -->` (ganze Sektion), `<!-- IF testimonials.google -->` (Badge).
+Direkt danach: `<!-- IF about.stats -->`-Statband auf der Home (REPEAT `about.stats`, Count-up).
+
+### garantie (Zusagen am Absende-Button beider Kontaktformulare)
+| Token | Beschreibung |
+|---|---|
+| REPEAT `garantie.items` → `{{.}}` | Konkrete, falsifizierbare Zusagen (nur Kontrollierbares) |
+
+IF-Block: `<!-- IF garantie -->` (index.html + kontakt/index.html, nach `#ktNote`).
+
+### Bewerbung (/karriere, Sektion `#bewerben`)
+- `karriere/index.html` trägt jetzt einen eigenen `wps-form-config`-Head-Block
+  (gleiche `forms`-Werte) und das Formular `#bwForm` (Felder `bwVor`, `bwNach`,
+  `bwTel`, `bwMail`, `bwStelle`, `bwMsg`, `bwHp`, `bwConsent`, `bwNote`).
+- REPEAT `karriere.jobs` füllt zusätzlich die `<option>`-Liste der Wunsch-Stelle;
+  Stellen-Links tragen `data-job="{{.title}}"` und zeigen auf `#bewerben`
+  (nie auf `/kontakt` — `build.mjs` prüft das fail-closed).
+- Neuer Formular-Text: `{{forms.texts.bewerbungSuccess}}` (Du-Form für Bewerber).
+- Payload an denselben n8n-Webhook, `thema: "Bewerbung: <Stelle>"`.

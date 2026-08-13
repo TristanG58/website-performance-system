@@ -500,6 +500,15 @@
         </div>
         <button class="btn-solid" type="submit">Jetzt kostenlose Beratung anfordern</button>
         <p class="kt-note" id="ktNote" style="display:none"></p>
+        <!-- IF garantie -->
+        <!-- Zusagen direkt am Absende-Button: der Zweifel ist unmittelbar vor
+             dem Klick am groessten — genau dort stehen die konkreten Zusagen. -->
+        <ul class="gu-list">
+          <!-- REPEAT garantie.items -->
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>{{.}}</li>
+          <!-- /REPEAT garantie.items -->
+        </ul>
+        <!-- /IF garantie -->
       </form>
 
     </div>

@@ -98,6 +98,21 @@ die fertigen Seiten. Feld-Referenz: **`reference/tokens.md`** (76 Skalare · 25 
      **Nach jeder späteren Änderung an `config/site.js` neu erzeugen und ersetzen** — sonst erzählt
      der Bot den Stand von vorgestern, und niemand merkt es.
    - Kundendomain in `allowedOrigins` **beider** Webhooks ergänzen (Lead-Empfang und Chat).
+6. **Conversion-Schicht füllen** (seit 2026-08-13 — Ziele: Terminbuchung + Bewerbung):
+   - **`hero.h1` = Kundennutzen, nicht Selbstbeschreibung.** Formel: Ergebnis fürs Haus/den
+     Kunden + Region („Ihr dichtes Dach in <Stadt>" schlägt „Wir sind Meisterbetrieb").
+     `hero.sub` trägt die Beweise: echte Jahre, Festpreis, Gewährleistung, Reaktionszeit.
+   - **`hero.trust`** (Sterne + Wert unter dem Hero-CTA) und **`testimonials`** (Kundenstimmen-
+     Sektion mit Google-Badge): **nur echte Werte aus dem Google-Profil** — echter Schnitt,
+     echte Anzahl, Bewertungen wörtlich (kürzen ja, umschreiben nein). Nichts Echtes da →
+     Block auf `null`, Sektion entfällt. **Erfundene Bewertungen sind tabu.**
+   - **`garantie.items`** (Zusagen am Absende-Button): nur, was der Betrieb selbst
+     kontrolliert (Festpreis, Reaktionszeit, Baustelle) — konkret und falsifizierbar,
+     nie Ergebnisse Dritter. Nichts Belegbares → `null`.
+   - **`about.stats`**: echte Zahlen oder Sektion streichen — „viele Jahre" ist Anti-Trust.
+   - **`karriere.jobs`** füllt zugleich die Wunsch-Stellen-Auswahl des Bewerbungsformulars
+     (`#bewerben` auf /karriere). Bewerber-Links bleiben auf `#bewerben` — nie aufs
+     Kunden-Kontaktformular routen.
 
 **Danach: `node build.mjs`** → rendert die Seiten nach `site/` und prüft sie (siehe Phase 5).
 **Tabu:** Struktur/Layout/CSS-Klassen/Animationen/Signatur-Komponenten (3D-Team-Karussell,
