@@ -86,6 +86,14 @@ if (jobs.length) {
     const meta = Array.isArray(j.meta) && j.meta.length ? " (" + j.meta.map(text).join(", ") + ")" : "";
     out.push("- " + text(j.title) + meta);
   }
+  // Ohne diesen Satz schickt der Bot Bewerber ins Kunden-Kontaktformular —
+  // derselbe Conversion-Bruch, den die Bewerber-Strecke am 2026-08-13 behoben hat.
+  out.push(
+    "- Bewerbungsweg: Auf der Seite /karriere steht ein kurzes Bewerbungsformular " +
+    "(Abschnitt „Bewerbung\", Anker #bewerben). Name, Telefon, E-Mail und Wunsch-Stelle " +
+    "genuegen — kein Anschreiben, kein Lebenslauf noetig. Wer sich bewerben moechte, " +
+    "wird DORTHIN verwiesen, nicht auf das Kontaktformular fuer Kundenanfragen."
+  );
 }
 
 const faq = (SITE.faq && SITE.faq.items) || [];
