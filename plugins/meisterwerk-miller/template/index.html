@@ -60,6 +60,20 @@
     </h1>
     <p class="sub">{{hero.sub}}</p>
     <a class="cta" href="{{hero.button.href}}">{{hero.button.label}}</a>
+    <!-- IF hero.trust -->
+    <!-- Trust am CTA: der Zweifel ist unmittelbar vor dem Klick am groessten —
+         der Beweis (Sterne + echter Google-Wert) steht deshalb direkt darunter. -->
+    <div class="hero-trust">
+      <span class="t-stars" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+      </span>
+      <span class="ht-txt"><b>{{hero.trust.value}}</b>&thinsp;/&thinsp;5 · {{hero.trust.count}}</span>
+    </div>
+    <!-- /IF hero.trust -->
   </div>
   <!-- IF brands -->
   <div class="hero-marq">
@@ -96,6 +110,18 @@
         <a class="hv2-btn hv2-btn-primary" href="{{hero.button.href}}">{{hero.button.label}}</a>
         <a class="hv2-btn hv2-btn-ghost" href="/leistungen">Unsere Leistungen</a>
       </div>
+      <!-- IF hero.trust -->
+      <div class="hero-trust">
+        <span class="t-stars" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+        </span>
+        <span class="ht-txt"><b>{{hero.trust.value}}</b>&thinsp;/&thinsp;5 · {{hero.trust.count}}</span>
+      </div>
+      <!-- /IF hero.trust -->
     </div>
   </div>
 </section>
@@ -136,7 +162,7 @@
 </section>
 
 <!-- ================= QUIZ WIZARD ================= -->
-<section class="quiz">
+<section class="quiz" id="beratung">
   <div class="quiz-bg"></div>
   <div class="quiz-shell">
     <div class="quiz-card" id="quizCard">
@@ -170,7 +196,7 @@
       <!-- Step 3: Standort -->
       <div class="qstep" data-step="3">
         <h3>Wo befindet sich das Objekt?</h3>
-        <div class="qfield"><label>PLZ oder Ort</label><input class="qinp" type="text" placeholder="z. B. 12345 Musterstadt"></div>
+        <div class="qfield"><label for="qOrt">PLZ oder Ort</label><input class="qinp" id="qOrt" type="text" placeholder="z. B. 12345 Musterstadt" autocomplete="postal-code"></div>
       </div>
 
       <!-- Step 4: Zeitrahmen -->
@@ -178,7 +204,7 @@
         <h3>Wann soll Ihr Projekt idealerweise starten?</h3>
         <div class="qfield"><label>Bitte geben Sie eine grobe Richtung an</label>
           <div class="qselwrap">
-            <select class="qinp"><option value="">Bitte wählen…</option><option>zeitnah</option><option>in 1–3 Monaten</option><option>später</option></select>
+            <select class="qinp" id="qZeit"><option value="">Bitte wählen…</option><option>zeitnah</option><option>in 1–3 Monaten</option><option>später</option></select>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1C3F60" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
           </div>
         </div>
@@ -189,13 +215,18 @@
         <h3>Ihre Kontaktdaten</h3>
         <p class="qsub">Wie können wir Sie am besten erreichen?</p>
         <div class="qrow2">
-          <div class="qfield"><label>Vorname *</label><input class="qinp" placeholder="Max"></div>
-          <div class="qfield"><label>Nachname *</label><input class="qinp" placeholder="Mustermann"></div>
+          <div class="qfield"><label for="qVor">Vorname *</label><input class="qinp" id="qVor" placeholder="Max" autocomplete="given-name"></div>
+          <div class="qfield"><label for="qNach">Nachname *</label><input class="qinp" id="qNach" placeholder="Mustermann" autocomplete="family-name"></div>
         </div>
-        <div class="qfield"><label>Telefon *</label><input class="qinp" type="tel" placeholder="0151 23456789"></div>
-        <div class="qfield"><label>E-Mail *</label><input class="qinp" type="email" placeholder="max@beispiel.de"></div>
-        <div class="qfield"><label>Beschreiben Sie Ihr Anliegen</label><textarea class="qinp" placeholder="Worum geht es?"></textarea></div>
-        <div class="qconsent"><input type="checkbox"><span>Mit dem Absenden stimmen Sie zu, dass wir Ihre Angaben zur Bearbeitung Ihrer Anfrage verwenden. Weitere Informationen finden Sie in unserer Datenschutzerklärung.</span></div>
+        <div class="qfield"><label for="qTel">Telefon *</label><input class="qinp" id="qTel" type="tel" placeholder="0151 23456789" autocomplete="tel"></div>
+        <div class="qfield"><label for="qMail">E-Mail *</label><input class="qinp" id="qMail" type="email" placeholder="max@beispiel.de" autocomplete="email"></div>
+        <div class="qfield"><label for="qMsg">Beschreiben Sie Ihr Anliegen</label><textarea class="qinp" id="qMsg" placeholder="Worum geht es?"></textarea></div>
+        <!-- Honeypot: fuer Menschen unsichtbar, Bots fuellen es aus -> Anfrage wird verworfen. -->
+        <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">
+          <label for="qHp">Website (bitte frei lassen)</label>
+          <input id="qHp" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
+        <div class="qconsent"><input type="checkbox" id="qConsent"><span>Mit dem Absenden stimmen Sie zu, dass wir Ihre Angaben zur Bearbeitung Ihrer Anfrage verwenden. Weitere Informationen finden Sie in unserer Datenschutzerklärung.</span></div>
       </div>
 
       <!-- Success -->
@@ -210,6 +241,7 @@
         <button class="qback" id="qBack" type="button" aria-label="Zurück" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
         <button class="qnext" id="qNext" type="button">Zum nächsten Schritt</button>
       </div>
+      <p class="qnote" id="qNote" role="status" aria-live="polite" style="display:none;margin:14px 0 0;font-size:14px;text-align:center"></p>
     </div>
   </div>
 </section>
@@ -285,6 +317,58 @@
 
 <!-- ================= TEAM ================= -->
 <!-- IF team.members -->
+<!-- ================= KUNDENSTIMMEN (Trust-Kern) ================= -->
+<!-- IF testimonials -->
+<section class="testi">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow-line">{{testimonials.eyebrow}}</div>
+      <h2>{{testimonials.h2}}</h2>
+      <!-- IF testimonials.google -->
+      <div class="t-badge">
+        <svg class="t-g" viewBox="0 0 24 24" aria-label="Google"><path fill="#4285F4" d="M23.5 12.3c0-.9-.1-1.5-.3-2.2H12v4.1h6.5c-.1 1.1-.8 2.7-2.4 3.8v.2l3.5 2.6h.2c2.2-2 3.7-5 3.7-8.5z"/><path fill="#34A853" d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.8-2.9c-1 .7-2.4 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-4.9h-.2l-3.6 2.8-.1.2C3.5 21.3 7.4 24 12 24z"/><path fill="#FBBC05" d="M5.3 14.5c-.3-.7-.4-1.6-.4-2.5s.1-1.8.4-2.5v-.2L1.6 6.5h-.1C.5 8.2 0 10 0 12s.5 3.8 1.5 5.5l3.8-3z"/><path fill="#EA4335" d="M12 4.6c2.2 0 3.7 1 4.5 1.8l3.3-3.2C17.9 1.2 15.2 0 12 0 7.4 0 3.5 2.7 1.5 6.5l3.8 3c.9-2.8 3.6-4.9 6.7-4.9z"/></svg>
+        <b>{{testimonials.google.value}}</b>
+        <span class="t-stars" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+        </span>
+        <span class="t-count">{{testimonials.google.count}}</span>
+      </div>
+      <!-- /IF testimonials.google -->
+    </div>
+    <div class="t-grid">
+      <!-- REPEAT testimonials.items -->
+      <figure class="t-card">
+        <span class="t-stars" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.4 7.4H22l-6 4.5 2.3 7.1L12 16.6 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+        </span>
+        <blockquote>„{{.text}}"</blockquote>
+        <figcaption><b>{{.name}}</b><span>{{.place}}</span></figcaption>
+      </figure>
+      <!-- /REPEAT testimonials.items -->
+    </div>
+  </div>
+</section>
+<!-- /IF testimonials -->
+
+<!-- ================= ZAHLEN-BEWEIS (Count-up) ================= -->
+<!-- IF about.stats -->
+<section class="statband">
+  <div class="wrap">
+    <!-- REPEAT about.stats -->
+    <div class="st"><b>{{.value}}</b><span>{{.label}}</span></div>
+    <!-- /REPEAT about.stats -->
+  </div>
+</section>
+<!-- /IF about.stats -->
+
 <section class="team" id="team">
   <div class="wrap">
     <div class="sec-head">

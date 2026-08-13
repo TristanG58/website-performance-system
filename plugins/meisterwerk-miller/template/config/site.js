@@ -78,7 +78,14 @@ const SITE = {
     titleAria: "Dach mit Zukunft. Qualität vom Meisterbetrieb.",
     titleLines: ["Dach mit Zukunft.", "Qualität vom Meisterbetrieb."],
     sub: "Mit langjähriger Erfahrung für Sie im Einsatz mit hochwertigen Dacharbeiten, Wartungen und Sanierungen in Musterstadt und Umgebung.",
-    button: { label: "Jetzt beraten lassen", href: "/kontakt" },
+    /* CTA fuehrt zum Quiz auf derselben Seite (niedrigste Huerde), nicht auf
+       /kontakt — der Besucher bleibt im Fluss statt eine Seite zu wechseln. */
+    button: { label: "Jetzt beraten lassen", href: "#beratung" },
+    /* Trust-Zeile direkt unter dem CTA (Sterne + Wert + Anzahl). REGEL: nur
+       echte Werte aus dem Google-Profil des Betriebs. Gibt es keine, den Block
+       auf null setzen — die Zeile entfaellt dann komplett. Der Zweifel des
+       Besuchers ist am Button am groessten; genau dort gehoert der Beweis hin. */
+    trust: { value: "4,9", count: "Demo-Bewertungen bei Google" },
   },
 
   /* ---- Quiz-Hintergrund (von render-all.mjs in styles.css .quiz-bg injiziert) ---- */
@@ -179,6 +186,24 @@ const SITE = {
       "/assets/placeholders/photo-roofing.svg",
       "/assets/placeholders/photo-roofing.svg",
       "/assets/placeholders/photo-roofing.svg",
+    ],
+  },
+
+  /* ---- Kundenstimmen (Home) — der Trust-Kern der Seite ----------------------
+     REGEL: ausschliesslich ECHTE Bewertungen aus dem Google-Profil des
+     Betriebs, woertlich uebernommen (kuerzen erlaubt, umschreiben nicht).
+     google.value/count = echter Schnitt + echte Anzahl. Gibt es keine oder zu
+     wenige echte Stimmen: den ganzen Block auf null setzen — Sektion und
+     Hero-Trust-Zeile entfallen dann. Erfundene Referenzen sind verboten
+     (Anti-Trust, rechtlich riskant). ------------------------------------------ */
+  testimonials: {
+    eyebrow: "Das sagen unsere Kunden",
+    h2: "Kunden aus Musterstadt über unsere Arbeit",
+    google: { value: "4,9", count: "Demo-Bewertungen" },
+    items: [
+      { text: "Demo-Referenz: Nach dem Sturm war eine Ziegelreihe weg. Schnell abgesichert, eine Woche später sauber repariert. So muss das sein.", name: "Max Mustermann", place: "Musterstadt" },
+      { text: "Demo-Referenz: Komplette Flachdachsanierung auf unserem Mehrfamilienhaus. Der Preis hat exakt gehalten, die Baustelle war jeden Abend aufgeräumt.", name: "Erika Musterfrau", place: "Musterstadt" },
+      { text: "Demo-Referenz: Zuverlässiger Partner für unsere Objekte. Termine werden gehalten, die Abrechnung ist nachvollziehbar.", name: "Musterverwaltung GmbH", place: "Musterstadt" },
     ],
   },
 
@@ -356,6 +381,7 @@ const SITE = {
       validation: "Bitte E-Mail angeben und der Datenschutzerklärung zustimmen.",
       sending: "Wird gesendet…",
       success: "Vielen Dank! Ihre Anfrage ist eingegangen – wir melden uns in Kürze.",
+      bewerbungSuccess: "Vielen Dank! Deine Bewerbung ist eingegangen – wir melden uns persönlich bei dir.",
       sent: "Anfrage gesendet ✓",
       error: "Ihre Anfrage konnte nicht gesendet werden. Bitte rufen Sie uns kurz an — wir helfen Ihnen sofort weiter.",
     },

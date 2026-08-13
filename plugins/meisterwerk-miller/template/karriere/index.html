@@ -13,6 +13,10 @@
 {"enabled":{{consent.enabled}},"version":"{{consent.version}}","validityDays":{{consent.validityDays}},"storageKey":"{{consent.storageKey}}","eventName":"{{consent.eventName}}","categories":{"necessary":{"enabled":{{consent.categories.necessary.enabled}},"required":{{consent.categories.necessary.required}}},"analytics":{"enabled":{{consent.categories.analytics.enabled}},"required":{{consent.categories.analytics.required}}},"marketing":{"enabled":{{consent.categories.marketing.enabled}},"required":{{consent.categories.marketing.required}}},"externalMedia":{"enabled":{{consent.categories.externalMedia.enabled}},"required":{{consent.categories.externalMedia.required}}}},"services":{{json consent.services}},"texts":{"bannerTitle":"{{consent.texts.bannerTitle}}","bannerBody":"{{consent.texts.bannerBody}}","acceptAll":"{{consent.texts.acceptAll}}","acceptNecessary":"{{consent.texts.acceptNecessary}}","settings":"{{consent.texts.settings}}","save":"{{consent.texts.save}}","settingsTitle":"{{consent.texts.settingsTitle}}","settingsIntro":"{{consent.texts.settingsIntro}}","close":"{{consent.texts.close}}","triggerLabel":"{{consent.texts.triggerLabel}}","categories":{"necessary":{"title":"{{consent.texts.categories.necessary.title}}","body":"{{consent.texts.categories.necessary.body}}"},"analytics":{"title":"{{consent.texts.categories.analytics.title}}","body":"{{consent.texts.categories.analytics.body}}"},"marketing":{"title":"{{consent.texts.categories.marketing.title}}","body":"{{consent.texts.categories.marketing.body}}"},"externalMedia":{"title":"{{consent.texts.categories.externalMedia.title}}","body":"{{consent.texts.categories.externalMedia.body}}"}}}}
 </script>
 <script type="module" src="/consent/consent.js"></script>
+<!-- WPS_FORM_HEAD -->
+<script type="application/json" id="wps-form-config">
+{"enabled":{{forms.enabled}},"endpoint":"{{forms.endpoint}}","clientId":"{{forms.clientId}}","minRenderMs":{{forms.minRenderMs}},"texts":{"validation":"{{forms.texts.validation}}","sending":"{{forms.texts.sending}}","success":"{{forms.texts.success}}","sent":"{{forms.texts.sent}}","error":"{{forms.texts.error}}","bewerbungSuccess":"{{forms.texts.bewerbungSuccess}}"}}
+</script>
 <script>if(!matchMedia('(prefers-reduced-motion:reduce)').matches)document.documentElement.classList.add('anim-on')</script>
 <!-- WPS_CHAT_HEAD -->
 <script type="application/json" id="wps-chat-config">
@@ -78,7 +82,7 @@
     </div>
     <div class="jobs">
       <!-- REPEAT karriere.jobs -->
-      <a class="job" href="/kontakt">
+      <a class="job" href="#bewerben" data-job="{{.title}}">
         <div>
           <h3>{{.title}}</h3>
           <div class="meta"><!-- REPEAT .meta --><span>{{.}}</span><!-- /REPEAT .meta --></div>
@@ -87,7 +91,55 @@
       </a>
       <!-- /REPEAT karriere.jobs -->
     </div>
-    <p style="text-align:center;color:var(--muted);margin-top:26px;font-size:15px">Nichts Passendes dabei? Wir freuen uns auch über deine <a href="/kontakt" style="color:var(--key1);font-weight:600">Initiativbewerbung</a>.</p>
+    <p style="text-align:center;color:var(--muted);margin-top:26px;font-size:15px">Nichts Passendes dabei? Wir freuen uns auch über deine <a href="#bewerben" style="color:var(--key1);font-weight:600">Initiativbewerbung</a>.</p>
+  </div>
+</section>
+
+<!-- ================= BEWERBUNG ================= -->
+<!-- Vorher fuehrte "Jetzt bewerben" ins Kunden-Kontaktformular ohne
+     Bewerbungs-Option — Conversion-Bruch am letzten Schritt. Der Bewerber
+     bleibt jetzt auf dieser Seite und bewirbt sich in einem Schritt. -->
+<section class="sec" id="bewerben">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow-line">Bewerbung</div>
+      <h2>In zwei Minuten beworben — ohne Anschreiben</h2>
+    </div>
+    <div class="bw-wrap">
+      <form class="kt-form" id="bwForm" novalidate>
+        <h3>Kurz vorstellen genügt</h3>
+        <p class="sub">Kein Anschreiben, kein Lebenslauf nötig. Name, Kontakt, Wunsch-Stelle — wir melden uns persönlich bei dir.</p>
+        <div class="qrow2">
+          <div class="qfield" style="margin-top:0"><label for="bwVor">Vorname *</label><input class="qinp" id="bwVor" type="text" placeholder="Max" autocomplete="given-name"></div>
+          <div class="qfield" style="margin-top:0"><label for="bwNach">Nachname *</label><input class="qinp" id="bwNach" type="text" placeholder="Mustermann" autocomplete="family-name"></div>
+        </div>
+        <div class="qrow2">
+          <div class="qfield"><label for="bwTel">Telefon *</label><input class="qinp" id="bwTel" type="tel" placeholder="0151 23456789" autocomplete="tel"></div>
+          <div class="qfield"><label for="bwMail">E-Mail *</label><input class="qinp" id="bwMail" type="email" placeholder="max@beispiel.de" autocomplete="email"></div>
+        </div>
+        <div class="qfield"><label for="bwStelle">Wunsch-Stelle</label>
+          <div class="qselwrap">
+            <select class="qinp" id="bwStelle">
+              <option value="">Bitte wählen…</option>
+              <!-- REPEAT karriere.jobs -->
+              <option>{{.title}}</option>
+              <!-- /REPEAT karriere.jobs -->
+              <option>Initiativbewerbung</option>
+            </select>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1C3F60" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </div>
+        <div class="qfield"><label for="bwMsg">Ein paar Zeilen zu dir (optional)</label><textarea class="qinp" id="bwMsg" placeholder="z. B. Erfahrung, seit wann im Handwerk, ab wann verfügbar …"></textarea></div>
+        <label class="qconsent"><input type="checkbox" id="bwConsent"><span>Ich stimme der Verarbeitung meiner Angaben gemäß der Datenschutzerklärung zu.</span></label>
+        <!-- Honeypot: fuer Menschen unsichtbar, Bots fuellen es aus -> Bewerbung wird verworfen. -->
+        <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">
+          <label for="bwHp">Website (bitte frei lassen)</label>
+          <input id="bwHp" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
+        <button class="btn-solid" type="submit">Jetzt bewerben</button>
+        <p class="kt-note" id="bwNote" role="status" aria-live="polite" style="display:none"></p>
+      </form>
+    </div>
   </div>
 </section>
 
@@ -95,7 +147,7 @@
 <section class="cta-band">
   <h2>Bereit, mit uns aufs Dach zu steigen?</h2>
   <p>Schick uns ein paar Zeilen zu dir – wir melden uns persönlich. Kein langer Bewerbungsprozess, einfach ein offenes Gespräch.</p>
-  <a class="btn-solid" href="/kontakt">Jetzt bewerben</a>
+  <a class="btn-solid" href="#bewerben">Jetzt bewerben</a>
 </section>
 
 <!-- ================= FOOTER (Sticky-Reveal) ================= -->

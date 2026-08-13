@@ -79,15 +79,84 @@
     back.style.display=cur===0?'none':'grid';
     next.textContent=cur===total-1?'Jetzt beraten lassen':'Zum nächsten Schritt';
   }
-  next.addEventListener('click',function(){
-    if(cur<total-1){ cur++; render(); }
-    else{
+  // ---- Absenden -> n8n-Webhook (forms.endpoint aus config/site.js) ----------
+  // Der Quiz-Funnel war bis 2026-07-28 eine Attrappe: er zeigte "Vielen Dank,
+  // wir melden uns" und verwarf die Anfrage. Derselbe stille Fehler, den das
+  // Kontaktformular am 2026-07-19 hatte (siehe learnings/templates/
+  // 2026-07-19_miller-kontaktformular-n8n-lead.md), nur nie fuers Quiz behoben.
+  // KERNREGEL, identisch zum Formular: Erfolg wird NIE vor HTTP 200 gemeldet.
+  var note=document.getElementById('qNote');
+  var qcfgEl=document.getElementById('wps-form-config');
+  var QCFG={}; try{ QCFG=JSON.parse(qcfgEl.textContent); }catch(e){}
+  var QT=QCFG.texts||{};
+  var quizRenderedAt=Date.now();
+  var quizBusy=false;
+
+  function qsay(msg,color){ if(!note) return; note.style.display='block'; note.style.color=color; note.textContent=msg; }
+  function qval(id){ var el=document.getElementById(id); return el?String(el.value||'').trim():''; }
+  function qchecked(name){
+    return [].slice.call(card.querySelectorAll('input[name="'+name+'"]:checked'))
+             .map(function(i){return i.value;}).join(', ');
+  }
+
+  function submitQuiz(){
+    if(quizBusy) return;
+    var mail=qval('qMail'), tel=qval('qTel');
+    var consentEl=document.getElementById('qConsent');
+    if(!mail || !tel || !(consentEl && consentEl.checked)){
+      qsay('Bitte Telefon und E-Mail angeben und der Datenschutzerklärung zustimmen.','#8A1F1F');
+      return;
+    }
+    if(!QCFG.enabled || !QCFG.endpoint){ qsay(QT.error||'Senden nicht möglich.','#8A1F1F'); return; }
+
+    var leistung=qchecked('leistung'), objekt=qchecked('objekt');
+    var ort=qval('qOrt'), zeit=qval('qZeit');
+    var payload={
+      clientId:  QCFG.clientId,
+      vorname:   qval('qVor'),
+      nachname:  qval('qNach'),
+      email:     mail,
+      telefon:   tel,
+      thema:     'Dach-Quiz: ' + (leistung || 'keine Angabe'),
+      nachricht: [
+        objekt ? 'Objekt: ' + objekt : '',
+        ort    ? 'Ort: ' + ort       : '',
+        zeit   ? 'Start: ' + zeit    : '',
+        qval('qMsg')
+      ].filter(Boolean).join('\n'),
+      website:   qval('qHp'),                    // Honeypot
+      elapsedMs: Date.now()-quizRenderedAt       // Time-Trap
+    };
+
+    quizBusy=true;
+    next.disabled=true; next.textContent=QT.sending||'Wird gesendet…';
+    qsay(QT.sending||'Wird gesendet…','#6B7280');
+
+    fetch(QCFG.endpoint,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    })
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); })
+    .then(function(){
+      // Erst JETZT den Erfolgsschritt zeigen.
       steps.forEach(function(s){s.classList.remove('active');});
       nav.style.display='none'; prog.style.display='none'; barWrap.style.display='none';
+      if(note) note.style.display='none';
       done.classList.add('show');
-    }
+    })
+    .catch(function(){
+      quizBusy=false;
+      next.disabled=false; render();   // stellt die Beschriftung des letzten Schritts wieder her
+      qsay(QT.error||'Ihre Anfrage konnte nicht gesendet werden. Bitte rufen Sie uns an.','#8A1F1F');
+    });
+  }
+
+  next.addEventListener('click',function(){
+    if(cur<total-1){ cur++; render(); if(note) note.style.display='none'; }
+    else{ submitQuiz(); }
   });
-  back.addEventListener('click',function(){ if(cur>0){ cur--; render(); } });
+  back.addEventListener('click',function(){ if(cur>0){ cur--; render(); if(note) note.style.display='none'; } });
   render();
 })();
 
@@ -289,6 +358,80 @@
   });
 })();
 
+// bewerbung form (karriere) -> derselbe n8n-Webhook wie das Kontaktformular.
+// Vorher fuehrte "Jetzt bewerben" ins Kunden-Kontaktformular ohne Bewerbungs-
+// Option — der Bewerber landete im falschen Kontext und sprang ab.
+// KERNREGEL wie ueberall: Erfolg wird NIE vor HTTP 200 gemeldet.
+(function(){
+  var f=document.getElementById('bwForm'); if(!f) return;
+  var note=document.getElementById('bwNote');
+  var cfgEl=document.getElementById('wps-form-config');
+  var BCFG={}; try{ BCFG=JSON.parse(cfgEl.textContent); }catch(e){}
+  var BT=BCFG.texts||{};
+  var btn=f.querySelector('button[type=submit]');
+  var btnLabel=btn?btn.textContent:'';
+  var renderedAt=Date.now();
+  var busy=false;
+
+  function say(msg,color){ if(!note) return; note.style.display='block'; note.style.color=color; note.textContent=msg; }
+  function val(id){ var el=document.getElementById(id); return el?String(el.value||'').trim():''; }
+
+  // Klick auf eine Stelle in der Liste springt zum Formular und waehlt sie vor.
+  var sel=document.getElementById('bwStelle');
+  [].slice.call(document.querySelectorAll('a.job[data-job]')).forEach(function(a){
+    a.addEventListener('click',function(){
+      if(!sel) return;
+      var t=a.getAttribute('data-job');
+      [].slice.call(sel.options).forEach(function(o){ if(o.text===t) sel.value=o.value||o.text; });
+    });
+  });
+
+  function submitBewerbung(){
+    if(busy) return;
+    var tel=val('bwTel'), mail=val('bwMail');
+    var consentEl=document.getElementById('bwConsent');
+    if(!tel || !mail || !(consentEl && consentEl.checked)){
+      say('Bitte Telefon und E-Mail angeben und der Datenschutzerklärung zustimmen.','#8A1F1F');
+      return;
+    }
+    if(!BCFG.enabled || !BCFG.endpoint){ say(BT.error||'Senden nicht möglich.','#8A1F1F'); return; }
+
+    var payload={
+      clientId:  BCFG.clientId,
+      vorname:   val('bwVor'),
+      nachname:  val('bwNach'),
+      email:     mail,
+      telefon:   tel,
+      thema:     'Bewerbung: ' + (val('bwStelle') || 'Initiativbewerbung'),
+      nachricht: val('bwMsg'),
+      website:   val('bwHp'),                 // Honeypot
+      elapsedMs: Date.now()-renderedAt        // Time-Trap
+    };
+
+    busy=true;
+    if(btn){ btn.disabled=true; btn.textContent=BT.sending; }
+    say(BT.sending,'#6B7280');
+
+    fetch(BCFG.endpoint,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    })
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); })
+    .then(function(){
+      say(BT.bewerbungSuccess||BT.success,'#1f9d6b');
+      if(btn) btn.textContent=BT.sent;
+    })
+    .catch(function(){
+      busy=false;
+      if(btn){ btn.disabled=false; btn.textContent=btnLabel; }
+      say(BT.error,'#8A1F1F');   // ehrlich scheitern statt still verlieren
+    });
+  }
+
+  f.addEventListener('submit',function(e){ e.preventDefault(); submitBewerbung(); });
+})();
+
 // chat-assistent -> n8n-Webhook (chat.endpoint aus config/site.js).
 // KERNREGEL: Bot-Antworten werden mit textContent gesetzt, NIE mit innerHTML.
 // Der Text kommt aus einem Sprachmodell, das seinerseits Besuchereingaben
@@ -443,7 +586,7 @@
   if(reduce || typeof gsap==='undefined' || typeof ScrollTrigger==='undefined'){ root.classList.remove('anim-on'); return; }
   gsap.registerPlugin(ScrollTrigger);
 
-  var SEL='.sec-head,.svc-card,.reason,.vt-top,.vcard,.job,.lst-row,.split>*,.statband .st,.fq,.faq-cta,.cta-band,.page-hero .ph-inner,.kt-grid';
+  var SEL='.sec-head,.svc-card,.reason,.vt-top,.vcard,.job,.lst-row,.split>*,.statband .st,.fq,.faq-cta,.cta-band,.page-hero .ph-inner,.kt-grid,.t-card';
   var els=gsap.utils.toArray(SEL);
   if(els.length){
     gsap.set(els,{opacity:0,y:26});

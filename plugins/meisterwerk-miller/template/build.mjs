@@ -233,6 +233,11 @@ console.log("  ✓ Registry autoritativ (config.consent.services == Browser-JSON
  *  Injiziert wird nichts — gleiche Entscheidung wie beim Consent-Block oben.
  * ========================================================================== */
 const FORM_PAGES = ["index.html", "kontakt/index.html"];
+// Die Karriere-Seite traegt seit 2026-08-13 ein eigenes Bewerbungsformular
+// (gleiche wps-form-config, eigener Handler submitBewerbung) — sie gehoert
+// deshalb zu den Config-Seiten, hat aber kein ktForm.
+const BW_PAGE = "karriere/index.html";
+const CFG_FORM_PAGES = [...FORM_PAGES, BW_PAGE];
 const DEMO_CLIENT_IDS = ["demo-musterwerk", "CHANGEME", "TODO", ""];
 const fv = [];
 
@@ -290,7 +295,7 @@ if (forms.enabled === false) {
 
   // C) Formular-Seiten (Output): genau 1 Config-Block, gueltiges JSON, Werte == SITE.forms
   const FORM_CFG_RE = /<script type="application\/json" id="wps-form-config">\s*([\s\S]*?)\s*<\/script>/g;
-  for (const rel of FORM_PAGES) {
+  for (const rel of CFG_FORM_PAGES) {
     const html = readFileSync(join(OUT, rel), "utf8");
     const blocks = [...html.matchAll(FORM_CFG_RE)];
     if (blocks.length !== 1) { fv.push(`${rel}: #wps-form-config ${blocks.length}× (erwartet 1)`); continue; }
@@ -301,7 +306,7 @@ if (forms.enabled === false) {
   }
 
   // D) Nicht-Formular-Seiten (Output): kein verwaister Config-Block
-  for (const rel of PAGES.filter((p) => !FORM_PAGES.includes(p))) {
+  for (const rel of PAGES.filter((p) => !CFG_FORM_PAGES.includes(p))) {
     const html = readFileSync(join(OUT, rel), "utf8");
     if (html.includes('id="wps-form-config"')) fv.push(`${rel}: unerwarteter #wps-form-config (keine Form auf der Seite)`);
   }
@@ -422,4 +427,119 @@ if (!chat || typeof chat !== "object") {
     process.exit(1);
   }
   console.log(`  ✓ Chat verdrahtet (Endpoint https, clientId == forms.clientId, Antworten als Text, Datenschutzhinweis vorhanden).`);
+}
+
+/* ==========================================================================
+ *  Quiz-Funnel (2026-07-28, Rueckport aus bedachungen-schwiertz 2026-08-13)
+ *  --------------------------------------------------------------------------
+ *  Das Quiz auf der Startseite war eine Attrappe: es zeigte "Vielen Dank, wir
+ *  melden uns innerhalb von 24 Stunden" und verwarf die Anfrage — kein fetch,
+ *  kein action. Exakt derselbe stille Fehler wie beim Kontaktformular
+ *  (learnings/templates/2026-07-19_miller-kontaktformular-n8n-lead.md, Error 1),
+ *  nur nie fuers Quiz behoben. Der Handler allein verhindert die Wiederholung
+ *  nicht — erst diese Pruefung tut das. Jedes Feature braucht seinen eigenen
+ *  fail-closed Check.
+ * ========================================================================== */
+{
+  const qv = [];
+  const home = readFileSync(join(OUT, "index.html"), "utf8");
+  const outMainQ = existsSync(join(OUT, "main.js")) ? readFileSync(join(OUT, "main.js"), "utf8") : "";
+
+  if (!home.includes('id="quizCard"')) {
+    qv.push("index.html: #quizCard fehlt — Lead-Funnel weg?");
+  } else {
+    // Markup: auslesbare Felder, Honeypot, Consent, Statuszeile.
+    for (const id of ["qVor", "qNach", "qTel", "qMail", "qOrt", "qZeit", "qMsg", "qHp", "qConsent", "qNote"]) {
+      if (!home.includes(`id="${id}"`)) qv.push(`index.html: Quiz-Feld #${id} fehlt — ohne id landet die Angabe in keinem Payload`);
+    }
+    if (!home.includes('id="wps-form-config"')) qv.push("index.html: #wps-form-config fehlt — Quiz kennt den Endpoint nicht");
+  }
+
+  if (!outMainQ) qv.push("Output fehlt: main.js");
+  else {
+    const start = outMainQ.indexOf("function submitQuiz");
+    if (start === -1) {
+      qv.push("main.js: submitQuiz() fehlt — das Quiz meldet Erfolg, ohne etwas zu senden (Attrappe)");
+    } else {
+      const teil = outMainQ.slice(start, start + 3000);
+      if (!/fetch\(\s*QCFG\.endpoint/.test(teil)) qv.push("main.js: submitQuiz sendet kein fetch auf QCFG.endpoint");
+      if (!/\.ok\b/.test(teil))                   qv.push("main.js: submitQuiz prueft den HTTP-Status nicht");
+      if (!/website:\s*qval\('qHp'\)/.test(teil)) qv.push("main.js: submitQuiz sendet kein Honeypot-Feld");
+      if (!/elapsedMs/.test(teil))                qv.push("main.js: submitQuiz sendet keine Time-Trap");
+      // Kernregel: der Erfolgsschritt darf NUR im .then nach dem ok-Check auftauchen.
+      const vorFetch = teil.slice(0, teil.indexOf("fetch("));
+      if (/done\.classList\.add\('show'\)/.test(vorFetch)) {
+        qv.push("main.js: Erfolgsschritt wird vor der Server-Antwort gezeigt — Erfolg nie vor HTTP 200 melden");
+      }
+    }
+    // Der alte Attrappen-Pfad darf nicht daneben ueberleben.
+    const nextHandler = outMainQ.slice(outMainQ.indexOf("next.addEventListener"));
+    if (/else\s*\{\s*steps\.forEach[\s\S]{0,200}done\.classList\.add\('show'\)/.test(nextHandler)) {
+      qv.push("main.js: der alte Attrappen-Zweig im next-Handler lebt noch");
+    }
+  }
+
+  if (qv.length) {
+    console.error("\n  ✗ Quiz-Validierung fehlgeschlagen:");
+    for (const m of qv) console.error("     - " + m);
+    process.exit(1);
+  }
+  console.log("  ✓ Quiz verdrahtet (Endpoint, Honeypot + Time-Trap, Erfolgsschritt erst nach HTTP 200).");
+}
+
+/* ==========================================================================
+ *  Bewerbungsformular (2026-08-13)
+ *  --------------------------------------------------------------------------
+ *  WARUM ES DIESEN BLOCK GIBT: "Jetzt bewerben" fuehrte ins Kunden-
+ *  Kontaktformular ("Worum geht es? Neues Dach / Dachsanierung ...") — der
+ *  Bewerber landete im falschen Kontext und sprang auf dem letzten Meter ab.
+ *  Die Karriere-Seite hat jetzt ein eigenes Formular. Und wie Kontaktformular
+ *  und Quiz vorher bewiesen haben: ohne eigenen fail-closed Check geht so
+ *  etwas still kaputt.
+ * ========================================================================== */
+if (forms && forms.enabled !== false) {
+  const bv = [];
+  const bwSrc = readFileSync(join(HERE, BW_PAGE), "utf8");
+  const bwOut = readFileSync(join(OUT, BW_PAGE), "utf8");
+  const outMainB = existsSync(join(OUT, "main.js")) ? readFileSync(join(OUT, "main.js"), "utf8") : "";
+
+  // A) Markup (Source + Output): Formular, Felder, Honeypot, Consent, Statuszeile.
+  for (const [label, html] of [["src", bwSrc], ["out", bwOut]]) {
+    if (count(html, 'id="bwForm"') !== 1) { bv.push(`${BW_PAGE} (${label}): #bwForm erwartet 1×`); continue; }
+    for (const id of ["bwVor", "bwNach", "bwTel", "bwMail", "bwStelle", "bwMsg", "bwHp", "bwConsent", "bwNote"]) {
+      if (!html.includes(`id="${id}"`)) bv.push(`${BW_PAGE} (${label}): Feld #${id} fehlt`);
+    }
+    if (count(html, "<!-- WPS_FORM_HEAD -->") !== 1) bv.push(`${BW_PAGE} (${label}): WPS_FORM_HEAD fehlt — Formular kennt den Endpoint nicht`);
+  }
+
+  // B) Kein Bewerbungs-Link darf mehr ins Kunden-Formular fuehren.
+  if (/class="job"[^>]*href="\/kontakt"/.test(bwOut)) bv.push(`${BW_PAGE}: Stellen-Link zeigt noch auf /kontakt statt #bewerben`);
+  if (!/href="#bewerben"/.test(bwOut)) bv.push(`${BW_PAGE}: kein Link auf #bewerben`);
+
+  // C) main.js (Output): submitBewerbung mit fetch, ok-Check, Honeypot, Time-Trap;
+  //    Erfolg nie vor der Server-Antwort.
+  if (!outMainB) bv.push("Output fehlt: main.js");
+  else {
+    const start = outMainB.indexOf("function submitBewerbung");
+    if (start === -1) {
+      bv.push("main.js: submitBewerbung() fehlt — das Bewerbungsformular meldet Erfolg, ohne etwas zu senden (Attrappe)");
+    } else {
+      const teil = outMainB.slice(start, start + 3000);
+      if (!/fetch\(\s*BCFG\.endpoint/.test(teil)) bv.push("main.js: submitBewerbung sendet kein fetch auf BCFG.endpoint");
+      if (!/\.ok\b/.test(teil))                   bv.push("main.js: submitBewerbung prueft den HTTP-Status nicht");
+      if (!/website:\s*val\('bwHp'\)/.test(teil)) bv.push("main.js: submitBewerbung sendet kein Honeypot-Feld");
+      if (!/elapsedMs/.test(teil))                bv.push("main.js: submitBewerbung sendet keine Time-Trap");
+      const vorFetch = teil.slice(0, teil.indexOf("fetch("));
+      if (/bewerbungSuccess|BT\.success/.test(vorFetch)) {
+        bv.push("main.js: Erfolgsmeldung vor der Server-Antwort — Erfolg nie vor HTTP 200 melden");
+      }
+    }
+  }
+
+  if (bv.length) {
+    console.error("\n  ✗ Bewerbungs-Validierung fehlgeschlagen:");
+    for (const m of bv) console.error("     - " + m);
+    process.exit(1);
+  }
+  console.log("  ✓ Bewerbung verdrahtet (eigenes Formular auf /karriere, Links auf #bewerben, Honeypot + Time-Trap, Erfolg erst nach HTTP 200).");
 }
