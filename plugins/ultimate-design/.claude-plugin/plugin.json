@@ -1,0 +1,23 @@
+{
+  "name": "ultimate-design",
+  "version": "0.1.0",
+  "description": "Ultimate Design Plugin: geführter Design-Prozess Brief → Entwurf → Iteration → Finish für Websites, Werbung und Ads. Orchestriert die installierten Design-Skills (impeccable, tasteskill, superdesign, frontend-design, transitions.dev, GSAP, mobbin, Higgsfield, Nano Banana, pro-copywriter, KAIROS-Design-System) in der richtigen Phase mit dem richtigen Auftrag, führt eine Projektakte (.ultimate-design/STATE.md), erzwingt die KAIROS-Hausregeln gegen AI-Slop und legt jede Design-Entscheidung als Vergleichs-Artifact zum Durchklicken vor. Die visuelle Abnahme macht der Mensch.",
+  "author": {
+    "name": "Kairos Digital"
+  },
+  "homepage": "https://github.com/TristanG58/website-performance-system",
+  "keywords": [
+    "design",
+    "website",
+    "landingpage",
+    "ads",
+    "werbung",
+    "anti-slop",
+    "prozess",
+    "impeccable",
+    "tasteskill",
+    "superdesign",
+    "gsap",
+    "higgsfield"
+  ]
+}

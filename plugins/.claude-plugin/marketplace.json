@@ -15,6 +15,12 @@
       "source": "./meisterwerk-miller",
       "description": "Meisterwerk v2 (Miller-Edition) — Dachdecker-Website-Werk auf Basis der Miller-Struktur: Navy + Steel-Blue, Albert Sans, 3D-Team-Karussell, Sticky-Reveal-Footer, Quiz-Funnel, GSAP-Animationen. Plain HTML/CSS/JS, config-getrieben, 1:1 replizierbar.",
       "version": "2.3.0"
+    },
+    {
+      "name": "ultimate-design",
+      "source": "./ultimate-design",
+      "description": "Ultimate Design Plugin: geführter Design-Prozess Brief → Entwurf → Iteration → Finish für Websites, Werbung und Ads. Orchestriert die installierten Design-Skills, führt eine Projektakte, erzwingt die KAIROS-Hausregeln gegen AI-Slop, Vergleichs-Artifacts für jede Entscheidung.",
+      "version": "0.1.0"
     }
   ]
 }
