@@ -29,6 +29,10 @@ Entscheidungen als Vergleichs-Artifact, visuelle Abnahme macht der Mensch.
 
 1. **Keine Phase ohne Gate.** Jede Phase endet mit einer Abnahme (AskUserQuestion). Erst nach dem
    „Ja" geht es weiter. Auch wenn der User drängt: die Abnahme ist der Prozess.
+   Fallback: wird AskUserQuestion abgelehnt oder bricht die Sitzung dabei ab (Desktop-App, Lindstedt
+   2026-11-05), die Gate-Frage mit denselben Optionen als Abschlussfrage der Runde stellen
+   (`wrap_up` mit Buttons) und auf die Antwort warten. Die Frage steht wörtlich in der Akte, damit
+   die nächste Session weiß, welches Gate offen ist. Nie ein Gate still überspringen.
 2. **Keine Entscheidung ohne Vergleich.** Wo etwas zu wählen ist (Richtung, Variante, Hero,
    Typografie, Motion), gibt es mindestens zwei Kandidaten als Vergleichs-Artifact zum Durchklicken
    ([reference/vergleichs-artifact.md](reference/vergleichs-artifact.md)). Nie nur beschreiben.

@@ -11,7 +11,11 @@ Voraussetzung: Gate 3 bestanden.
   (Text A, Blacklist B, Lackmus C, Landing/App D/E).
 - Agent **impeccable-finish-reviewer**: Review gegen Direction-Contract, Comp und Welt-Qualitätsbar.
 - `impeccable critique <ziel>` mit Score, wenn noch keiner in der Akte steht.
-Beide Listen zusammenführen, nach Wirkung ordnen, in die Akte. P0/P1 müssen in dieser Phase weg.
+Beide Agenten parallel starten (ein Aufruf, zwei Agent-Tools), beide Listen zu **einem Batch**
+zusammenführen, nach Wirkung ordnen, in die Akte. Den Batch in einem Durchgang umsetzen und erst
+danach messen (Schritt 4), nicht nach jedem Punkt. P0/P1 müssen in dieser Phase weg. Was bewusst
+nicht umgesetzt wird (gehört in die Kundenversion, braucht eine Freigabe, widerspricht der Richtung),
+steht mit Grund in der Akte unter „Bewusst nicht umgesetzt", sonst taucht es im nächsten Review wieder auf.
 
 ## 2. Polish und Härtung
 
